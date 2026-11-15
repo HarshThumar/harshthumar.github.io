@@ -4,19 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agent Authorization for Indian Payments, Formally &middot; Harsh Thumar</title>
-  <meta name="description" content="What a UPI-Style Mandate Must Cryptographically Bind When an AI Agent Pays, and Which Defensive Checks Protect What.">
+  <meta name="description" content="A formal cryptographic analysis of autonomous AI agent payments under NPCI's UPI Circle, rich authorization requests (RFC 9396), DPoP sender constraints, and real-time online revocation.">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'neutral',
-      fontFamily: 'Plus Jakarta Sans, sans-serif'
-    });
-  </script>
 
   <style>
     *, *::before, *::after {
@@ -28,7 +20,7 @@
     :root {
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-serif: 'Newsreader', Georgia, serif;
-      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
       --color-bg: #fafbfc;
       --color-surface: #ffffff;
@@ -40,19 +32,19 @@
       --color-text-muted: #475569;
       --color-text-faint: #64748b;
       
-      --color-primary: #3b82f6;
-      --color-primary-hover: #2563eb;
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
       --color-primary-soft: #eff6ff;
       --color-primary-border: #bfdbfe;
 
-      --color-indigo: #6366f1;
+      --color-indigo: #4f46e5;
       --color-indigo-soft: #eef2ff;
-      --color-amber: #f59e0b;
+      --color-amber: #d97706;
       --color-amber-soft: #fef3c7;
-      --color-emerald: #10b981;
+      --color-emerald: #059669;
       --color-emerald-soft: #ecfdf5;
-      --color-rose: #f43f5e;
-      --color-rose-soft: #ffe4e6;
+      --color-rose: #e11d48;
+      --color-rose-soft: #fff1f2;
 
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.07), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
@@ -62,6 +54,10 @@
       --breakout-width: 1040px;
       --full-width: 1280px;
       --viewport-pad: clamp(16px, 4vw, 36px);
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -79,7 +75,7 @@
       left: 0;
       height: 3px;
       width: 0%;
-      background: linear-gradient(90deg, #10b981, #3b82f6, #6366f1);
+      background: linear-gradient(90deg, #059669, #2563eb, #4f46e5);
       z-index: 100;
       transition: width 0.1s linear;
     }
@@ -119,6 +115,10 @@
       box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
       flex-shrink: 0;
       transition: transform 0.15s ease;
+    }
+
+    .brand-group:hover .brand-logo {
+      transform: scale(1.05);
     }
 
     .brand-title {
@@ -175,8 +175,8 @@
       align-items: center;
       gap: 8px;
       background: var(--color-emerald-soft);
-      color: var(--color-emerald);
-      border: 1px solid var(--color-border);
+      color: #065f46;
+      border: 1px solid #a7f3d0;
       padding: 4px 12px;
       border-radius: 9999px;
       font-size: 0.8125rem;
@@ -240,13 +240,14 @@
       display: inline-block;
       width: 4px;
       height: 24px;
-      background: linear-gradient(180deg, #10b981, #3b82f6);
+      background: linear-gradient(180deg, #059669, #2563eb);
       border-radius: 2px;
     }
 
     p {
       margin-bottom: 22px;
       color: var(--color-text-main);
+      font-size: 1.0625rem;
     }
 
     ul, ol {
@@ -256,6 +257,7 @@
 
     li {
       margin-bottom: 10px;
+      color: var(--color-text-main);
     }
 
     strong {
@@ -268,8 +270,26 @@
       text-decoration: underline;
       text-decoration-thickness: 1.5px;
       text-underline-offset: 3px;
+      transition: color 0.15s ease;
     }
 
+    a:hover {
+      color: var(--color-primary-hover);
+    }
+
+    blockquote {
+      background: var(--color-surface-sunken);
+      border-left: 4px solid var(--color-primary);
+      padding: 16px 22px;
+      margin: 28px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 1.125rem;
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--color-text-main);
+    }
+
+    /* Custom Callouts */
     .callout-box {
       border-radius: 12px;
       padding: 22px 26px;
@@ -280,44 +300,108 @@
 
     .callout-box.info {
       background: var(--color-primary-soft);
-      border-left: 6px solid #3b82f6;
+      border-left: 6px solid #2563eb;
     }
 
     .callout-box.india {
       background: var(--color-amber-soft);
-      border-left: 6px solid #f59e0b;
+      border-left: 6px solid #d97706;
+    }
+
+    .callout-box.verified {
+      background: var(--color-emerald-soft);
+      border-left: 6px solid #059669;
     }
 
     .callout-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-weight: 800;
       font-size: 0.95rem;
       margin-bottom: 10px;
-      color: #1e40af;
     }
 
-    .callout-box.india .callout-header {
-      color: #92400e;
+    .callout-box.info .callout-header { color: #1e40af; }
+    .callout-box.india .callout-header { color: #92400e; }
+    .callout-box.verified .callout-header { color: #065f46; }
+
+    .callout-box p:last-child {
+      margin-bottom: 0;
     }
 
     code {
       font-family: var(--font-mono);
       font-size: 0.88em;
       background: var(--color-surface-sunken);
+      color: var(--color-text-main);
       padding: 2px 7px;
       border-radius: 6px;
       border: 1px solid var(--color-border);
     }
 
+    /* Diagram Card */
     .diagram-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: 16px;
       margin: 40px 0;
       box-shadow: var(--shadow-md);
-      padding: 24px;
-      overflow-x: auto;
+      overflow: hidden;
     }
 
+    .diagram-header-bar {
+      padding: 14px 20px;
+      background: var(--color-surface-sunken);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .diagram-pill {
+      background: var(--color-emerald-soft);
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .diagram-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    .diagram-svg-container {
+      padding: 28px 24px;
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+      background: var(--color-surface);
+    }
+
+    .diagram-svg-container svg {
+      width: 100%;
+      height: auto;
+      max-width: 960px;
+      display: block;
+    }
+
+    .diagram-caption {
+      padding: 12px 20px;
+      background: var(--color-surface-sunken);
+      border-top: 1px solid var(--color-border);
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    /* Full-Width Table */
     .table-container {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
@@ -342,6 +426,7 @@
     th {
       padding: 14px 18px;
       font-weight: 700;
+      color: var(--color-text-main);
       font-size: 0.82rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -350,11 +435,96 @@
     td {
       padding: 16px 18px;
       border-bottom: 1px solid var(--color-border-subtle);
+      color: var(--color-text-main);
       vertical-align: middle;
     }
 
     tr:last-child td {
       border-bottom: none;
+    }
+
+    .badge-check {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--color-emerald-soft);
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    /* Terminal UI */
+    .terminal-card {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      margin: 36px 0;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .terminal-bar {
+      background: #161b22;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .terminal-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .terminal-label {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #8b949e;
+      font-weight: 500;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #c9d1d9;
+      font-size: 0.75rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    .terminal-body {
+      padding: 20px 24px;
+      overflow-x: auto;
+    }
+
+    .terminal-body pre {
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: #e6edf3;
+      margin: 0;
     }
 
     footer.post-footer {
@@ -422,9 +592,10 @@
 
     <div class="callout-box info">
       <div class="callout-header">Public Research Notice</div>
-      <p>Public draft for comment. Not legal advice, not a regulatory interpretation, and not endorsed by NPCI, RBI, CERT-In, or any standards body. Model code and proofs are open-source in the <a href="https://github.com/HarshThumar/mcp-auth-tamarin" target="_blank" rel="noopener">mcp-auth-tamarin</a> repository.</p>
+      <p>Public draft for comment. Not legal advice, not a regulatory interpretation, and not endorsed by NPCI, RBI, CERT-In, or any standards body. All formal Tamarin models, proofs, and the complete 64-combination ablation lattice are open source under the MIT license in the <a href="https://github.com/HarshThumar/mcp-auth-tamarin" target="_blank" rel="noopener">mcp-auth-tamarin</a> repository.</p>
     </div>
 
+    <!-- Section 1 -->
     <section>
       <h2 class="section-heading">1. Executive Summary</h2>
       <p>As artificial intelligence agents transition from informational assistants to transactional actors, they are increasingly tasked with executing financial operations on behalf of human principals. In India, the Unified Payments Interface (UPI) ecosystem has established a global benchmark for instant retail payments. Through NPCI's UPI Circle initiative (introduced in circular OC 201 and expanded to IoT devices and software entities in addendum OC 201-B), India already possesses a production framework for delegating payment authority from a primary account holder to a secondary user or automated software agent.</p>
@@ -432,93 +603,428 @@
       <p>The central engineering and cryptographic question is:</p>
       <blockquote>When an autonomous software agent executes payments under a delegated mandate, what guarantees that every debit remains strictly within the bounds approved by the human principal?</blockquote>
 
-      <p>To answer this question without relying on informal assertions, we developed a machine-checked formal protocol model in the Tamarin prover (<code>models/05_agent_payment_mandate.spthy</code>). The model formalizes the interaction between a human principal (payer), an authorization server (issuing PSP/bank), an autonomous software agent, a payment server (acquiring PSP/switch), and an active Dolev-Yao network attacker.</p>
+      <p>To answer this question without relying on informal assertions, we developed a machine-checked formal protocol model in the Tamarin prover (<code>models/05_agent_payment_mandate.spthy</code>). The model formalizes the interaction between a human principal (payer), an authorization server (issuing PSP/bank), an autonomous software agent, a payment server (acquiring PSP/switch), and an active Dolev-Yao network attacker who can intercept, alter, and inject network traffic, while accounting for leaked payment logs (as posited in the FAPI 2.0 attacker model).</p>
+
+      <p>The model incorporates modern OAuth 2.1 building blocks:</p>
+      <ul>
+        <li><strong>Rich Authorization Requests (RFC 9396):</strong> Expressing granular financial scopes, merchant identities, and amount caps.</li>
+        <li><strong>Resource Indicators (RFC 8707):</strong> Binding mandates to explicit payment server audiences.</li>
+        <li><strong>Demonstrating Proof-of-Possession (RFC 9449 DPoP):</strong> Cryptographically binding mandates to agent-held asymmetric keypairs.</li>
+        <li><strong>Online Token Revocation (RFC 7009):</strong> Real-time lookup of mandate validity at execution time.</li>
+      </ul>
+
+      <p>When all defensive checks are active, Tamarin mathematically verifies three core security lemmas across every possible execution trace:</p>
+      <ul>
+        <li><strong>Lemma P10 (Debit Within Intent):</strong> A debit occurs if and only if it targets the approved payee, at the designated payment server, within the authorized amount cap.</li>
+        <li><strong>Lemma P11 (Immediate Revocation Enforcement):</strong> No payment succeeds after the human principal delinks or revokes the mandate.</li>
+        <li><strong>Lemma P12 (Authentic Agent Requests):</strong> An honest agent's payment request cannot be forged, replayed, or manipulated by an attacker who observes previous network traffic or payment logs.</li>
+      </ul>
     </section>
 
+    <!-- Figure 1: Breakout Vector SVG Architecture Diagram -->
+    <div class="breakout diagram-card">
+      <div class="diagram-header-bar">
+        <div>
+          <span class="diagram-pill">Figure 1</span>
+          <span class="diagram-title">UPI Circle Agent Payment Delegation Lifecycle</span>
+        </div>
+      </div>
+
+      <div class="diagram-svg-container">
+        <svg viewBox="0 0 940 440" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Actor Headers -->
+          <!-- Payer -->
+          <rect x="20" y="20" width="165" height="46" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+          <text x="102" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#3730a3" text-anchor="middle">Primary Payer</text>
+          <text x="102" y="57" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#6366f1" text-anchor="middle">Account Holder (MPIN)</text>
+          <line x1="102" y1="66" x2="102" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- Issuing PSP / AS -->
+          <rect x="210" y="20" width="165" height="46" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+          <text x="292" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#1e40af" text-anchor="middle">Issuer PSP / Bank</text>
+          <text x="292" y="57" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#3b82f6" text-anchor="middle">Authorization Server</text>
+          <line x1="292" y1="66" x2="292" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- Autonomous Agent -->
+          <rect x="400" y="20" width="165" height="46" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+          <text x="482" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#92400e" text-anchor="middle">Software Agent</text>
+          <text x="482" y="57" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#d97706" text-anchor="middle">Secondary Delegate (DPoP)</text>
+          <line x1="482" y1="66" x2="482" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- Payment Server / NPCI -->
+          <rect x="590" y="20" width="165" height="46" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+          <text x="672" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#065f46" text-anchor="middle">Payment Switch / PSP</text>
+          <text x="672" y="57" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#10b981" text-anchor="middle">Acquiring Server / MMS</text>
+          <line x1="672" y1="66" x2="672" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- Merchant Payee -->
+          <rect x="780" y="20" width="140" height="46" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+          <text x="850" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#334155" text-anchor="middle">Payee Merchant</text>
+          <text x="850" y="57" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Target VPA</text>
+          <line x1="850" y1="66" x2="850" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+          <!-- Phase 1: Mandate Issuance -->
+          <rect x="60" y="85" width="460" height="24" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+          <text x="290" y="101" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#475569" text-anchor="middle">Phase 1: Mandate Delegation Setup (Out-of-Band Auth + RFC 9396 RAR)</text>
+
+          <line x1="102" y1="130" x2="282" y2="130" stroke="#2563eb" stroke-width="1.5"/>
+          <polygon points="282,127 292,130 282,133" fill="#2563eb"/>
+          <text x="197" y="124" font-family="'JetBrains Mono', monospace" font-size="10" fill="#1e40af" text-anchor="middle">1. Payer Approves Mandate (MPIN/Biometric)</text>
+
+          <line x1="292" y1="160" x2="472" y2="160" stroke="#059669" stroke-width="1.5"/>
+          <polygon points="472,157 482,160 472,163" fill="#059669"/>
+          <text x="387" y="154" font-family="'JetBrains Mono', monospace" font-size="10" fill="#065f46" text-anchor="middle">2. Issue Signed Mandate (Cap, Payee, cnf Key)</text>
+
+          <!-- Phase 2: Autonomous Execution -->
+          <rect x="360" y="185" width="440" height="24" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+          <text x="580" y="201" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#475569" text-anchor="middle">Phase 2: Autonomous Debit Execution (RFC 9449 DPoP Signed)</text>
+
+          <line x1="482" y1="230" x2="662" y2="230" stroke="#d97706" stroke-width="1.5"/>
+          <polygon points="662,227 672,230 662,233" fill="#d97706"/>
+          <text x="577" y="224" font-family="'JetBrains Mono', monospace" font-size="10" fill="#92400e" text-anchor="middle">3. Submit Payment (Mandate + DPoP Proof)</text>
+
+          <!-- Phase 3: Synchronous Verification & Revocation Check -->
+          <rect x="260" y="255" width="440" height="24" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+          <text x="480" y="271" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#475569" text-anchor="middle">Phase 3: Real-Time Invariant Enforcement &amp; Revocation Lookup</text>
+
+          <line x1="672" y1="300" x2="302" y2="300" stroke="#e11d48" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <polygon points="302,297 292,300 302,303" fill="#e11d48"/>
+          <text x="482" y="294" font-family="'JetBrains Mono', monospace" font-size="10" fill="#9f1239" text-anchor="middle">4. Synchronous Status Check (RFC 7009 / MMS)</text>
+
+          <line x1="292" y1="325" x2="662" y2="325" stroke="#059669" stroke-width="1.5"/>
+          <polygon points="662,322 672,325 662,328" fill="#059669"/>
+          <text x="482" y="320" font-family="'JetBrains Mono', monospace" font-size="10" fill="#065f46" text-anchor="middle">5. Status Valid: Mandate Active &amp; Not Revoked</text>
+
+          <!-- Phase 4: Settlement -->
+          <line x1="672" y1="360" x2="840" y2="360" stroke="#059669" stroke-width="1.8"/>
+          <polygon points="840,357 850,360 840,363" fill="#059669"/>
+          <text x="761" y="354" font-family="'JetBrains Mono', monospace" font-size="10" fill="#065f46" text-anchor="middle">6. Credit Payee VPA</text>
+
+          <line x1="672" y1="385" x2="492" y2="385" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <polygon points="492,382 482,385 492,388" fill="#64748b"/>
+          <text x="577" y="380" font-family="'JetBrains Mono', monospace" font-size="10" fill="#334155" text-anchor="middle">7. Return Settlement Confirmation</text>
+        </svg>
+      </div>
+
+      <div class="diagram-caption">
+        Figure 1: Complete protocol sequence for delegated agent payments under UPI Circle, showing primary consent, DPoP-signed debit execution, and synchronous online revocation lookup.
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <section>
+      <h2 class="section-heading">2. The Problem: Autonomous Agents Under UPI Circle</h2>
+      <p>In a traditional human-initiated payment, multi-factor authentication (MFA) provides a synchronized security perimeter: the account holder reviews the recipient and amount on a trusted screen and immediately inputs an out-of-band credential (such as a 4- or 6-digit UPI MPIN or biometric prompt).</p>
+
+      <p>Agentic payments fundamentally alter this paradigm. The human principal authorizes authority asynchronously in advance:</p>
+      <ul>
+        <li>"Pay my monthly electricity and broadband utility bills automatically."</li>
+        <li>"Purchase flight tickets for my upcoming conference up to INR 8,000."</li>
+        <li>"Procure inventory supplies from approved vendors whenever stock drops below threshold."</li>
+      </ul>
+
+      <p>The agent (frequently driven by a Large Language Model processing untrusted external inputs) acts at an arbitrary time later. If the agent is compromised, hallucinating, or subjected to indirect prompt injection via a malicious invoice or merchant webpage, it may attempt an out-of-policy transaction.</p>
+
+      <p>Because the human principal is not present during payment execution, the mandate itself becomes the sole authorization gate. In the absence of formal cryptographic constraints, three critical failure modes emerge:</p>
+
+      <ol>
+        <li><strong>Mandate Distortion:</strong> An authorization server or intermediary issues a mandate that exceeds the scope or amount approved by the principal.</li>
+        <li><strong>Out-of-Bounds Execution:</strong> The agent submits a debit targeting an unauthorized payee, exceeding the cumulative limit, or routing the request through an unapproved payment intermediary.</li>
+        <li><strong>Post-Cancellation Zombie Debits:</strong> The principal revokes delegation in their banking application, but because downstream payment nodes rely on unexpired token timestamps or static TTL caches, debits continue until the mandate window lapses.</li>
+      </ol>
+
+      <p>These vulnerabilities cannot be mitigated by instructing the LLM to behave ethically. Safety must be enforced deterministically at the protocol and cryptographic boundaries of the payment infrastructure.</p>
+    </section>
+
+    <!-- Section 3 -->
+    <section>
+      <h2 class="section-heading">3. What an Agent Payment Mandate Must Bind</h2>
+      <p>To resist symbolic and real-world adversaries, a payment mandate must serve as a cryptographically verifiable capability token binding six non-negotiable parameters:</p>
+    </section>
+
+    <!-- Breakout Mandate Structure Table -->
     <div class="breakout table-container">
       <table>
         <thead>
           <tr>
-            <th>Security Property</th>
-            <th>Necessary and Sufficient Check Set in Formal Model</th>
+            <th>Binding Parameter</th>
+            <th>Cryptographic Enforcement</th>
+            <th>Adversarial Consequence if Omitted</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>P10 (Debit within intent)</strong></td>
-            <td>Principal consent binding + Payee exact match + Amount cap + Payment server audience check</td>
+            <td><strong>Payer Consent Stamping</strong></td>
+            <td>Out-of-band MPIN/biometric verification signed by Issuer Bank AS</td>
+            <td>AS issues mandates without principal knowledge; unauthorized debits succeed</td>
           </tr>
           <tr>
-            <td><strong>P11 (No debit after cancellation)</strong></td>
-            <td>Per-payment real-time online revocation lookup at the payment server</td>
+            <td><strong>Exact Payee Restriction</strong></td>
+            <td>Exact string match against approved merchant VPA (RFC 9396)</td>
+            <td>Agent or attacker redirects funds to arbitrary recipient bank account</td>
           </tr>
           <tr>
-            <td><strong>P12 (Authentic agent requests)</strong></td>
-            <td>Cryptographic proof-of-possession (DPoP sender-constraint)</td>
+            <td><strong>Amount Caps (Single &amp; Cumulative)</strong></td>
+            <td>Discrete transaction and period ceiling checks enforced by Payment Server</td>
+            <td>Debit exceeds approved limits, draining account balances</td>
+          </tr>
+          <tr>
+            <td><strong>Audience Binding (RFC 8707)</strong></td>
+            <td>Mandate strictly lists target Payment Server URI in <code>aud</code> claim</td>
+            <td>Token replayed across unrelated payment switches or banks</td>
+          </tr>
+          <tr>
+            <td><strong>Proof-of-Possession (RFC 9449)</strong></td>
+            <td>Agent public key stamped in mandate (<code>cnf</code>); request signed with private key</td>
+            <td>Network eavesdropper replays leaked payment payload with fresh transaction ID</td>
+          </tr>
+          <tr>
+            <td><strong>Synchronous Online Revocation</strong></td>
+            <td>Real-time status check at central MMS/revocation ledger before debit</td>
+            <td>Debits continue uninterrupted after principal cancels mandate in mobile app</td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!-- Section 4 -->
     <section>
-      <h2 class="section-heading">2. What an Agent Payment Mandate Must Bind</h2>
-      <p>To resist symbolic and real-world adversaries, a payment mandate must serve as a cryptographically verifiable capability token binding six non-negotiable parameters:</p>
-      <ol>
-        <li><strong>Payer Approval (Consent Stamping):</strong> Evidence that the primary account holder authorized the specific parameters over an authenticated channel.</li>
-        <li><strong>Payee Restriction:</strong> Explicit Virtual Payment Address (VPA) or merchant identifier (exact string match).</li>
-        <li><strong>Transaction &amp; Cumulative Amount Caps:</strong> Strict financial limits defining single-transaction thresholds and cumulative period ceilings.</li>
-        <li><strong>Audience Restriction (RFC 8707):</strong> Identification of the single designated payment server / switch authorized to process debits under it.</li>
-        <li><strong>Agent Key Binding (Proof of Possession / RFC 9449 DPoP):</strong> Stamped public key of the agent, requiring fresh cryptographic signatures per payment.</li>
-        <li><strong>Online Revocation Endpoint (RFC 7009):</strong> Real-time lookup verifying mandate validity at the moment of debit execution.</li>
-      </ol>
+      <h2 class="section-heading">4. Formal Tamarin Proofs &amp; Ablation Lattice</h2>
+      <p>We specified the payment delegation lifecycle in Tamarin Prover (<code>models/05_agent_payment_mandate.spthy</code>), evaluating the protocol against a standard Dolev-Yao attacker who has complete control over network transit (intercepting, modifying, injecting, and replaying packets). In alignment with the FAPI 2.0 security profile, transaction requests are assumed to be leakable (for example, through server access logs or telemetry sinks).</p>
+      
+      <p>By systematically ablating checks one at a time across all 64 permutations, Tamarin revealed the precise causal relationship between defensive controls and failure traces:</p>
     </section>
 
+    <!-- Figure 2: Breakout SVG Ablation Lattice -->
     <div class="breakout diagram-card">
-      <pre class="mermaid">
-flowchart TD
-    subgraph Hardened["Hardened State (All Checks Active)"]
-        H0["Full Defensive Stack"] --> OK["P10, P11, P12 Verified"]
-    end
+      <div class="diagram-header-bar">
+        <div>
+          <span class="diagram-pill">Figure 2</span>
+          <span class="diagram-title">Model 05 Ablation Lattice &amp; Minimal Sufficient Check Sets</span>
+        </div>
+      </div>
 
-    subgraph Ablation["Ablation Results (Counterexample Traces Found)"]
-        F1["NO_CONSENT_BINDING"] --> E1["AS issues unapproved mandate; unauthorized debit succeeds"]
-        F2["NO_PAYEE_CHECK"] --> E2["Agent or attacker redirects funds to arbitrary recipient"]
-        F3["NO_AMOUNT_CHECK"] --> E3["Debit exceeds authorized transaction cap"]
-        F4["NO_AUD (Audience)"] --> E4["Mandate issued for Bank A replayed against Bank B"]
-        F5["NO_SENDER_CONSTRAINT"] --> E5["Leaked request replayed with fresh payment ID (Bearer Token Attack)"]
-        F6["NO_REVOCATION_CHECK"] --> E6["Debits continue after principal revokes delegation"]
-    end
-      </pre>
+      <div class="diagram-svg-container">
+        <svg viewBox="0 0 940 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Root Node -->
+          <rect x="250" y="16" width="440" height="48" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+          <text x="470" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#065f46" text-anchor="middle">Hardened Baseline: All 6 Checks Active</text>
+          <text x="470" y="53" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#059669" text-anchor="middle">Lemmas P10, P11, P12 Machine-Checked &amp; Formally Proved</text>
+
+          <!-- Distribution Connector Lines -->
+          <line x1="470" y1="64" x2="470" y2="86" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="85" y1="86" x2="855" y2="86" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="85" y1="86" x2="85" y2="104" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="239" y1="86" x2="239" y2="104" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="393" y1="86" x2="393" y2="104" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="547" y1="86" x2="547" y2="104" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="701" y1="86" x2="701" y2="104" stroke="#94a3b8" stroke-width="1.5"/>
+          <line x1="855" y1="86" x2="855" y2="104" stroke="#94a3b8" stroke-width="1.5"/>
+
+          <!-- 6 Clean Ablation Cards -->
+          <!-- Card 1 -->
+          <rect x="10" y="104" width="150" height="152" rx="8" fill="#ffffff" stroke="#fecdd3" stroke-width="1.5"/>
+          <rect x="18" y="112" width="134" height="24" rx="4" fill="#fff1f2"/>
+          <text x="85" y="128" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">NO_CONSENT</text>
+          <text x="85" y="150" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Omit User Approval</text>
+          <line x1="20" y1="160" x2="150" y2="160" stroke="#f1f5f9" stroke-width="1"/>
+          <text x="85" y="180" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">AS issues unapproved</text>
+          <text x="85" y="195" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">mandates; debit</text>
+          <text x="85" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">steals funds</text>
+          <rect x="20" y="226" width="130" height="20" rx="4" fill="#fee2e2"/>
+          <text x="85" y="240" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle">P10 Fails</text>
+
+          <!-- Card 2 -->
+          <rect x="164" y="104" width="150" height="152" rx="8" fill="#ffffff" stroke="#fecdd3" stroke-width="1.5"/>
+          <rect x="172" y="112" width="134" height="24" rx="4" fill="#fff1f2"/>
+          <text x="239" y="128" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">NO_PAYEE</text>
+          <text x="239" y="150" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Omit Payee Match</text>
+          <line x1="174" y1="160" x2="304" y2="160" stroke="#f1f5f9" stroke-width="1"/>
+          <text x="239" y="180" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">Agent redirects</text>
+          <text x="239" y="195" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">debit to arbitrary</text>
+          <text x="239" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">attacker VPA</text>
+          <rect x="174" y="226" width="130" height="20" rx="4" fill="#fee2e2"/>
+          <text x="239" y="240" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle">P10 Fails</text>
+
+          <!-- Card 3 -->
+          <rect x="318" y="104" width="150" height="152" rx="8" fill="#ffffff" stroke="#fecdd3" stroke-width="1.5"/>
+          <rect x="326" y="112" width="134" height="24" rx="4" fill="#fff1f2"/>
+          <text x="393" y="128" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">NO_AMOUNT</text>
+          <text x="393" y="150" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Omit Cap Validation</text>
+          <line x1="328" y1="160" x2="458" y2="160" stroke="#f1f5f9" stroke-width="1"/>
+          <text x="393" y="180" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">Debits exceed</text>
+          <text x="393" y="195" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">authorized caps,</text>
+          <text x="393" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">draining balances</text>
+          <rect x="328" y="226" width="130" height="20" rx="4" fill="#fee2e2"/>
+          <text x="393" y="240" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle">P10 Fails</text>
+
+          <!-- Card 4 -->
+          <rect x="472" y="104" width="150" height="152" rx="8" fill="#ffffff" stroke="#fecdd3" stroke-width="1.5"/>
+          <rect x="480" y="112" width="134" height="24" rx="4" fill="#fff1f2"/>
+          <text x="547" y="128" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">NO_AUD</text>
+          <text x="547" y="150" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Omit Server Audience</text>
+          <line x1="482" y1="160" x2="612" y2="160" stroke="#f1f5f9" stroke-width="1"/>
+          <text x="547" y="180" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">Mandate for Bank A</text>
+          <text x="547" y="195" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">replayed against</text>
+          <text x="547" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">Bank B payment switch</text>
+          <rect x="482" y="226" width="130" height="20" rx="4" fill="#fee2e2"/>
+          <text x="547" y="240" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle">P10 Fails</text>
+
+          <!-- Card 5 -->
+          <rect x="626" y="104" width="150" height="152" rx="8" fill="#ffffff" stroke="#fecdd3" stroke-width="1.5"/>
+          <rect x="634" y="112" width="134" height="24" rx="4" fill="#fff1f2"/>
+          <text x="701" y="128" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">NO_SENDER_CNF</text>
+          <text x="701" y="150" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Omit DPoP Binding</text>
+          <line x1="636" y1="160" x2="766" y2="160" stroke="#f1f5f9" stroke-width="1"/>
+          <text x="701" y="180" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">Leaked request</text>
+          <text x="701" y="195" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">replayed with fresh</text>
+          <text x="701" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">payment identifier</text>
+          <rect x="636" y="226" width="130" height="20" rx="4" fill="#fee2e2"/>
+          <text x="701" y="240" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle">P12 Fails</text>
+
+          <!-- Card 6 -->
+          <rect x="780" y="104" width="150" height="152" rx="8" fill="#ffffff" stroke="#fecdd3" stroke-width="1.5"/>
+          <rect x="788" y="112" width="134" height="24" rx="4" fill="#fff1f2"/>
+          <text x="855" y="128" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">NO_ONLINE_REVOC</text>
+          <text x="855" y="150" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Omit MMS Lookup</text>
+          <line x1="790" y1="160" x2="920" y2="160" stroke="#f1f5f9" stroke-width="1"/>
+          <text x="855" y="180" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">Agent continues debits</text>
+          <text x="855" y="195" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">after user revokes</text>
+          <text x="855" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" fill="#334155" text-anchor="middle">mandate in mobile app</text>
+          <rect x="790" y="226" width="130" height="20" rx="4" fill="#fee2e2"/>
+          <text x="855" y="240" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#991b1b" text-anchor="middle">P11 Fails</text>
+        </svg>
+      </div>
+
+      <div class="diagram-caption">
+        Figure 2: Machine-checked ablation lattice for Model 05 demonstrating that each security lemma requires an independent, non-redundant cryptographic control.
+      </div>
     </div>
 
+    <!-- Section 5 -->
     <section>
-      <h2 class="section-heading">3. Alignment with Indian Frameworks</h2>
-      <p>We mapped the machine-checked findings to Indian regulatory, policy, and technical frameworks:</p>
+      <h2 class="section-heading">5. Comparative Analysis of Global Agent Payment Schemes</h2>
+      <p>We surveyed emerging industry initiatives for delegated autonomous payments against the formalized model invariants:</p>
+    </section>
+
+    <!-- Breakout Comparison Table -->
+    <div class="breakout table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Security Invariant</th>
+            <th>Visa Intelligent Commerce / TAP</th>
+            <th>Mastercard Verifiable Intent (v0.1)</th>
+            <th>NPCI UPI Circle (OC 201 &amp; OC 201-B)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Principal Consent</strong></td>
+            <td>Passkey-authenticated instruction</td>
+            <td>Cardholder mandate signed by device key</td>
+            <td>App linking authenticated via UPI MPIN</td>
+          </tr>
+          <tr>
+            <td><strong>Payee Binding</strong></td>
+            <td>Merchant name verified against mandate</td>
+            <td>Exact match on <code>allowed_merchants</code></td>
+            <td>Person-to-merchant delegation; strict VPA binding needed</td>
+          </tr>
+          <tr>
+            <td><strong>Financial Caps</strong></td>
+            <td><code>declineThreshold</code> aggregated per instruction</td>
+            <td><code>amount_range</code> and cumulative <code>budget</code></td>
+            <td>Per-transaction (&le;5K) and monthly (&le;15K) limits</td>
+          </tr>
+          <tr>
+            <td><strong>Payment Server Audience</strong></td>
+            <td>Not defined as an explicit audience claim</td>
+            <td>Not found in public draft</td>
+            <td>Not found in public circulars; recommended</td>
+          </tr>
+          <tr>
+            <td><strong>Proof of Possession</strong></td>
+            <td>Fresh <code>agentSignature</code> (RFC 9421 HTTP Signatures)</td>
+            <td>Agent key bound with <code>cnf</code>; signs final order</td>
+            <td>Device and user ID validated per payment</td>
+          </tr>
+          <tr>
+            <td><strong>Synchronous Online Revocation</strong></td>
+            <td>Issuer-side token revocation; no per-payment check stated</td>
+            <td>Short expiry windows; no real-time lookup defined</td>
+            <td>App delinking; synchronous per-payment check needed</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 6 -->
+    <section>
+      <h2 class="section-heading">6. Alignment with Indian Frameworks</h2>
+      <p>This technical mapping identifies where each machine-checked protocol check supports stated policy objectives:</p>
     </section>
 
     <div class="callout-box india">
-      <div class="callout-header">Regulatory &amp; Technical Alignment</div>
+      <div class="callout-header">Regulatory &amp; Legal Framework Mapping</div>
       <ul>
-        <li><strong>NPCI UPI Circle (OC 201 &amp; OC 201-B):</strong> Formally proves the security boundaries required for Mode 1 (Full Delegation: Spend With Limit) for software delegates.</li>
-        <li><strong>RBI FREE-AI Committee Report:</strong> Supports the core Sutras of Trust, Accountability, Resilience, and Explainability through deterministic cryptographic verification.</li>
-        <li><strong>DPDP Act 2023:</strong> Guarantees specific consent via rich authorization parameters and withdrawable consent via synchronous online revocation.</li>
+        <li><strong>NPCI UPI Circle (OC 201 &amp; OC 201-B):</strong> Formally proves the cryptographic boundaries required for Mode 1 (Full Delegation: Spend With Limit), ensuring that autonomous software delegates cannot execute transactions beyond approved parameters.</li>
+        <li><strong>RBI FREE-AI Committee Report:</strong> Directly supports the core Sutras of <em>Trust, Accountability, Resilience, and Explainability</em> by anchoring agent transactions in deterministic, tamper-evident cryptographic evidence rather than probabilistic LLM assertions.</li>
+        <li><strong>Digital Personal Data Protection (DPDP) Act 2023:</strong> Satisfies Section 6 mandates requiring consent to be specific (enforced via RFC 9396 rich authorization limits) and continuously withdrawable (enforced via real-time online revocation checks).</li>
       </ul>
     </div>
 
+    <!-- Section 7 -->
     <section>
-      <h2 class="section-heading">4. Implementation Checklist</h2>
-      <p>PSPs, banks, and payment network operators should verify:</p>
+      <h2 class="section-heading">7. Technical Implementation Checklist</h2>
+      <p>For Payment Service Providers, issuing banks, and payment network operators:</p>
+      
       <ol>
-        <li>Capture primary human consent out-of-band via biometric or MPIN authentication.</li>
-        <li>Stamp exact payee VPA, caps, payment server audience, and agent public key into signed mandate JWTs.</li>
-        <li>Enforce strict DPoP proof-of-possession verification for every outbound debit request.</li>
-        <li>Query synchronous online revocation registries before committing debits.</li>
+        <li><strong>Mandate Issuance:</strong> Issue mandates only after capturing explicit principal consent over a dedicated, out-of-band channel (e.g., banking app with biometric or MPIN authentication).</li>
+        <li><strong>Mandate Structure:</strong> Encode exact payee identifiers, transaction ceilings, expiration timestamps, target payment server URI, and the agent's public key into a signed mandate JWT.</li>
+        <li><strong>DPoP Verification:</strong> Require fresh asymmetric proof-of-possession signatures (RFC 9449) over outbound payment requests, validating the signature against the key stamped in the mandate.</li>
+        <li><strong>Synchronous Revocation:</strong> Execute an online query against the central revocation repository (or distributed status ledger) synchronously before committing funds. Do not rely on local token expiration windows.</li>
+        <li><strong>Replay Cache:</strong> Maintain a synchronized payment ID cache to ensure one-time request processing.</li>
       </ol>
     </section>
 
+    <!-- Section 8: Reproduce it -->
+    <section>
+      <h2 class="section-heading">8. How to Reproduce</h2>
+      <p>Every formal model, security lemma, and ablation permutation is fully reproducible via Docker without installing Tamarin locally:</p>
+    </section>
+
+    <div class="breakout terminal-card">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <span class="terminal-label">bash: reproduce formal proofs</span>
+        <button class="copy-btn" id="copy-btn" data-clipboard="docker build -t mcp-auth-tamarin .&#10;docker run --rm mcp-auth-tamarin ./scripts/reproduce.sh">Copy</button>
+      </div>
+      <div class="terminal-body">
+        <pre><code>docker build -t mcp-auth-tamarin .
+docker run --rm mcp-auth-tamarin ./scripts/reproduce.sh</code></pre>
+      </div>
+    </div>
+
+    <!-- Section 9: References -->
+    <section>
+      <h2 class="section-heading">9. References &amp; Primary Sources</h2>
+      <ul>
+        <li>NPCI: Unified Payments Interface Operating Circular OC 201-B (8 October 2025): <em>Introduction of IoT devices / software on UPI Circle</em>.</li>
+        <li>Reserve Bank of India: Report of the Committee on Framework for Responsible and Ethical Enablement of Artificial Intelligence (FREE-AI), PR 2025-2026/902 (13 August 2025).</li>
+        <li>CERT-In: <em>Technical Guidelines on SBOM, QBOM, CBOM, AIBOM and HBOM (Version 2.0)</em> (9 July 2025); <em>Blueprint for Defending against AI-Assisted Exploitation in Digital Infrastructure (Version 1.0)</em> (25 May 2026).</li>
+        <li>Ministry of Electronics and Information Technology (MeitY): <em>Digital Personal Data Protection Act, 2023 (Act No. 22 of 2023)</em> and <em>DPDP Rules 2025</em>.</li>
+        <li>IETF Standards &amp; Drafts: RFC 9396 (Rich Authorization Requests); RFC 8707 (Resource Indicators); RFC 9449 (DPoP); RFC 7009 (Token Revocation); draft-mishra-oauth-agent-grants-02 (OAuth Profile for Delegated AI Agent Authorization).</li>
+      </ul>
+    </section>
+
     <footer class="post-footer">
-      <div>&copy; 2026 Harsh Thumar &middot; MIT License</div>
-      <div>Formal Verification of Delegated Agent Payment Mandates</div>
+      <div>&copy; 2026 Harsh Thumar &middot; Published under MIT License</div>
+      <div>Formal Verification of Model Context Protocol &amp; Delegated Payment Mandates</div>
     </footer>
 
   </main>
@@ -530,6 +1036,18 @@ flowchart TD
       const scrolled = (winScroll / height) * 100;
       document.getElementById('progress-bar').style.width = scrolled + '%';
     });
+
+    const copyBtn = document.getElementById('copy-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const text = copyBtn.getAttribute('data-clipboard');
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = copyBtn.textContent;
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => { copyBtn.textContent = orig; }, 2000);
+        });
+      });
+    }
   </script>
 </body>
 </html>
