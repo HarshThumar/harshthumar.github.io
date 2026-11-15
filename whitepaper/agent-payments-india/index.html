@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Authorization for Indian Payments, Formally &middot; Harsh Thumar</title>
+  <meta name="description" content="What a UPI-Style Mandate Must Cryptographically Bind When an AI Agent Pays, and Which Defensive Checks Protect What.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      fontFamily: 'Plus Jakarta Sans, sans-serif'
+    });
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-serif: 'Newsreader', Georgia, serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+      --color-bg: #fafbfc;
+      --color-surface: #ffffff;
+      --color-surface-sunken: #f1f5f9;
+      --color-border: #e2e8f0;
+      --color-border-subtle: #edf2f7;
+      
+      --color-text-main: #1e293b;
+      --color-text-muted: #475569;
+      --color-text-faint: #64748b;
+      
+      --color-primary: #3b82f6;
+      --color-primary-hover: #2563eb;
+      --color-primary-soft: #eff6ff;
+      --color-primary-border: #bfdbfe;
+
+      --color-indigo: #6366f1;
+      --color-indigo-soft: #eef2ff;
+      --color-amber: #f59e0b;
+      --color-amber-soft: #fef3c7;
+      --color-emerald: #10b981;
+      --color-emerald-soft: #ecfdf5;
+      --color-rose: #f43f5e;
+      --color-rose-soft: #ffe4e6;
+
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.07), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 10px -3px rgba(0, 0, 0, 0.04);
+
+      --content-width: 720px;
+      --breakout-width: 1040px;
+      --full-width: 1280px;
+      --viewport-pad: clamp(16px, 4vw, 36px);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      line-height: 1.78;
+      font-size: 1.0625rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #3b82f6, #6366f1);
+      z-index: 100;
+      transition: width 0.1s linear;
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      background-color: rgba(250, 251, 252, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .nav-inner {
+      max-width: var(--full-width);
+      margin: 0 auto;
+      padding: 14px var(--viewport-pad);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--color-text-main);
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: block;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-link {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--color-primary);
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns:
+        [full-start] minmax(var(--viewport-pad), 1fr)
+        [breakout-start] minmax(0, calc((var(--breakout-width) - var(--content-width)) / 2))
+        [content-start] min(var(--content-width), 100%) [content-end]
+        minmax(0, calc((var(--breakout-width) - var(--content-width)) / 2)) [breakout-end]
+        minmax(var(--viewport-pad), 1fr) [full-end];
+      padding-top: 48px;
+      padding-bottom: 32px;
+    }
+
+    .post-grid > * {
+      grid-column: content;
+    }
+
+    .post-grid > .breakout {
+      grid-column: breakout;
+      width: 100%;
+    }
+
+    .article-header {
+      margin-bottom: 40px;
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--color-emerald-soft);
+      color: var(--color-emerald);
+      border: 1px solid var(--color-border);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    h1.article-title {
+      font-size: clamp(2rem, 3.8vw, 3rem);
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      color: var(--color-text-main);
+      margin-bottom: 20px;
+    }
+
+    .article-subtitle {
+      font-family: var(--font-serif);
+      font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+      font-weight: 400;
+      margin-bottom: 32px;
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .meta-author {
+      font-weight: 700;
+      color: var(--color-text-main);
+    }
+
+    h2.section-heading {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--color-text-main);
+      letter-spacing: -0.02em;
+      margin-top: 56px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2.section-heading::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 24px;
+      background: linear-gradient(180deg, #10b981, #3b82f6);
+      border-radius: 2px;
+    }
+
+    p {
+      margin-bottom: 22px;
+      color: var(--color-text-main);
+    }
+
+    ul, ol {
+      margin-bottom: 28px;
+      padding-left: 28px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    strong {
+      color: var(--color-text-main);
+      font-weight: 700;
+    }
+
+    a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+      text-underline-offset: 3px;
+    }
+
+    .callout-box {
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin: 32px 0;
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .callout-box.info {
+      background: var(--color-primary-soft);
+      border-left: 6px solid #3b82f6;
+    }
+
+    .callout-box.india {
+      background: var(--color-amber-soft);
+      border-left: 6px solid #f59e0b;
+    }
+
+    .callout-header {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      color: #1e40af;
+    }
+
+    .callout-box.india .callout-header {
+      color: #92400e;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: var(--color-surface-sunken);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--color-border);
+    }
+
+    .diagram-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      margin: 40px 0;
+      box-shadow: var(--shadow-md);
+      padding: 24px;
+      overflow-x: auto;
+    }
+
+    .table-container {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      margin: 36px 0;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    thead {
+      background: var(--color-surface-sunken);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    th {
+      padding: 14px 18px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--color-border-subtle);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    footer.post-footer {
+      grid-column: breakout;
+      border-top: 1px solid var(--color-border);
+      padding-top: 20px;
+      padding-bottom: 16px;
+      margin-top: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.88rem;
+      color: var(--color-text-faint);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progress-bar"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/" class="brand-group">
+        <svg class="brand-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Harsh Thumar logo">
+          <rect width="32" height="32" rx="8" fill="url(#brand-grad)"/>
+          <defs>
+            <linearGradient id="brand-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#2563eb"/>
+              <stop offset="1" stop-color="#4f46e5"/>
+            </linearGradient>
+          </defs>
+          <path d="M16 6.5L8.5 9.8V15.5C8.5 20.8 11.7 25.2 16 26.5C20.3 25.2 23.5 20.8 23.5 15.5V9.8L16 6.5Z" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="16" cy="13.2" r="2.2" fill="#ffffff"/>
+          <path d="M14.6 16.2H17.4L18 20.8H14L14.6 16.2Z" fill="#ffffff"/>
+        </svg>
+        <span class="brand-title">Harsh Thumar</span>
+      </a>
+      <div class="nav-actions">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/blog/2026-11-ietf127-mcp-authorization/" class="nav-link">MCP Blog</a>
+        <a href="https://github.com/HarshThumar/mcp-auth-tamarin" class="nav-link" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="post-grid">
+
+    <header class="article-header">
+      <span class="tag-pill">Cryptographic Architecture Whitepaper &middot; India</span>
+      <h1 class="article-title">Agent Authorization for Indian Payments, Formally</h1>
+      <p class="article-subtitle">What a UPI-Style Mandate Must Cryptographically Bind When an AI Agent Pays, and Which Defensive Checks Protect What.</p>
+      
+      <div class="meta-bar">
+        <span class="meta-author">Harsh Thumar</span>
+        <span>&middot;</span>
+        <span>Remote Participant, IETF</span>
+        <span>&middot;</span>
+        <span>Independent Researcher</span>
+        <span>&middot;</span>
+        <time datetime="2026-11-15">15 November 2026</time>
+      </div>
+    </header>
+
+    <div class="callout-box info">
+      <div class="callout-header">Public Research Notice</div>
+      <p>Public draft for comment. Not legal advice, not a regulatory interpretation, and not endorsed by NPCI, RBI, CERT-In, or any standards body. Model code and proofs are open-source in the <a href="https://github.com/HarshThumar/mcp-auth-tamarin" target="_blank" rel="noopener">mcp-auth-tamarin</a> repository.</p>
+    </div>
+
+    <section>
+      <h2 class="section-heading">1. Executive Summary</h2>
+      <p>As artificial intelligence agents transition from informational assistants to transactional actors, they are increasingly tasked with executing financial operations on behalf of human principals. In India, the Unified Payments Interface (UPI) ecosystem has established a global benchmark for instant retail payments. Through NPCI's UPI Circle initiative (introduced in circular OC 201 and expanded to IoT devices and software entities in addendum OC 201-B), India already possesses a production framework for delegating payment authority from a primary account holder to a secondary user or automated software agent.</p>
+      
+      <p>The central engineering and cryptographic question is:</p>
+      <blockquote>When an autonomous software agent executes payments under a delegated mandate, what guarantees that every debit remains strictly within the bounds approved by the human principal?</blockquote>
+
+      <p>To answer this question without relying on informal assertions, we developed a machine-checked formal protocol model in the Tamarin prover (<code>models/05_agent_payment_mandate.spthy</code>). The model formalizes the interaction between a human principal (payer), an authorization server (issuing PSP/bank), an autonomous software agent, a payment server (acquiring PSP/switch), and an active Dolev-Yao network attacker.</p>
+    </section>
+
+    <div class="breakout table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Security Property</th>
+            <th>Necessary and Sufficient Check Set in Formal Model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>P10 (Debit within intent)</strong></td>
+            <td>Principal consent binding + Payee exact match + Amount cap + Payment server audience check</td>
+          </tr>
+          <tr>
+            <td><strong>P11 (No debit after cancellation)</strong></td>
+            <td>Per-payment real-time online revocation lookup at the payment server</td>
+          </tr>
+          <tr>
+            <td><strong>P12 (Authentic agent requests)</strong></td>
+            <td>Cryptographic proof-of-possession (DPoP sender-constraint)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <section>
+      <h2 class="section-heading">2. What an Agent Payment Mandate Must Bind</h2>
+      <p>To resist symbolic and real-world adversaries, a payment mandate must serve as a cryptographically verifiable capability token binding six non-negotiable parameters:</p>
+      <ol>
+        <li><strong>Payer Approval (Consent Stamping):</strong> Evidence that the primary account holder authorized the specific parameters over an authenticated channel.</li>
+        <li><strong>Payee Restriction:</strong> Explicit Virtual Payment Address (VPA) or merchant identifier (exact string match).</li>
+        <li><strong>Transaction &amp; Cumulative Amount Caps:</strong> Strict financial limits defining single-transaction thresholds and cumulative period ceilings.</li>
+        <li><strong>Audience Restriction (RFC 8707):</strong> Identification of the single designated payment server / switch authorized to process debits under it.</li>
+        <li><strong>Agent Key Binding (Proof of Possession / RFC 9449 DPoP):</strong> Stamped public key of the agent, requiring fresh cryptographic signatures per payment.</li>
+        <li><strong>Online Revocation Endpoint (RFC 7009):</strong> Real-time lookup verifying mandate validity at the moment of debit execution.</li>
+      </ol>
+    </section>
+
+    <div class="breakout diagram-card">
+      <pre class="mermaid">
+flowchart TD
+    subgraph Hardened["Hardened State (All Checks Active)"]
+        H0["Full Defensive Stack"] --> OK["P10, P11, P12 Verified"]
+    end
+
+    subgraph Ablation["Ablation Results (Counterexample Traces Found)"]
+        F1["NO_CONSENT_BINDING"] --> E1["AS issues unapproved mandate; unauthorized debit succeeds"]
+        F2["NO_PAYEE_CHECK"] --> E2["Agent or attacker redirects funds to arbitrary recipient"]
+        F3["NO_AMOUNT_CHECK"] --> E3["Debit exceeds authorized transaction cap"]
+        F4["NO_AUD (Audience)"] --> E4["Mandate issued for Bank A replayed against Bank B"]
+        F5["NO_SENDER_CONSTRAINT"] --> E5["Leaked request replayed with fresh payment ID (Bearer Token Attack)"]
+        F6["NO_REVOCATION_CHECK"] --> E6["Debits continue after principal revokes delegation"]
+    end
+      </pre>
+    </div>
+
+    <section>
+      <h2 class="section-heading">3. Alignment with Indian Frameworks</h2>
+      <p>We mapped the machine-checked findings to Indian regulatory, policy, and technical frameworks:</p>
+    </section>
+
+    <div class="callout-box india">
+      <div class="callout-header">Regulatory &amp; Technical Alignment</div>
+      <ul>
+        <li><strong>NPCI UPI Circle (OC 201 &amp; OC 201-B):</strong> Formally proves the security boundaries required for Mode 1 (Full Delegation: Spend With Limit) for software delegates.</li>
+        <li><strong>RBI FREE-AI Committee Report:</strong> Supports the core Sutras of Trust, Accountability, Resilience, and Explainability through deterministic cryptographic verification.</li>
+        <li><strong>DPDP Act 2023:</strong> Guarantees specific consent via rich authorization parameters and withdrawable consent via synchronous online revocation.</li>
+      </ul>
+    </div>
+
+    <section>
+      <h2 class="section-heading">4. Implementation Checklist</h2>
+      <p>PSPs, banks, and payment network operators should verify:</p>
+      <ol>
+        <li>Capture primary human consent out-of-band via biometric or MPIN authentication.</li>
+        <li>Stamp exact payee VPA, caps, payment server audience, and agent public key into signed mandate JWTs.</li>
+        <li>Enforce strict DPoP proof-of-possession verification for every outbound debit request.</li>
+        <li>Query synchronous online revocation registries before committing debits.</li>
+      </ol>
+    </section>
+
+    <footer class="post-footer">
+      <div>&copy; 2026 Harsh Thumar &middot; MIT License</div>
+      <div>Formal Verification of Delegated Agent Payment Mandates</div>
+    </footer>
+
+  </main>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progress-bar').style.width = scrolled + '%';
+    });
+  </script>
+</body>
+</html>
