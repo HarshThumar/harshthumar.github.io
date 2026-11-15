@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Authorization for Indian Payments, Formally &middot; Harsh Thumar</title>
+  <title>Agent Authorization for Indian Payments, Formally · Harsh Thumar</title>
   <meta name="description" content="A formal cryptographic analysis of autonomous AI agent payments under NPCI's UPI Circle, rich authorization requests (RFC 9396), DPoP sender constraints, and real-time online revocation.">
-  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
@@ -146,32 +147,41 @@
       color: var(--color-primary);
     }
 
+    /* 3-Tier Grid Layout */
     .post-grid {
       display: grid;
-      grid-template-columns:
-        [full-start] minmax(var(--viewport-pad), 1fr)
-        [breakout-start] minmax(0, calc((var(--breakout-width) - var(--content-width)) / 2))
-        [content-start] min(var(--content-width), 100%) [content-end]
-        minmax(0, calc((var(--breakout-width) - var(--content-width)) / 2)) [breakout-end]
-        minmax(var(--viewport-pad), 1fr) [full-end];
-      padding-top: 48px;
-      padding-bottom: 32px;
+      grid-template-columns: 
+        1fr 
+        min(var(--content-width), 100% - (var(--viewport-pad) * 2)) 
+        1fr;
+      row-gap: 1.75rem;
+      padding: 40px var(--viewport-pad) 100px;
     }
 
     .post-grid > * {
-      grid-column: content;
+      grid-column: 2;
+      min-width: 0;
     }
 
     .post-grid > .breakout {
-      grid-column: breakout;
+      grid-column: 1 / -1;
+      width: min(var(--breakout-width), 100% - (var(--viewport-pad) * 2));
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .post-grid > .full-bleed {
+      grid-column: 1 / -1;
       width: 100%;
     }
 
     .article-header {
-      margin-bottom: 40px;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--color-border);
     }
 
-    .tag-pill {
+    .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -180,11 +190,11 @@
       border: 1px solid #a7f3d0;
       padding: 4px 12px;
       border-radius: 9999px;
-      font-size: 0.8125rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 1.25rem;
     }
 
     h1.article-title {
@@ -193,287 +203,118 @@
       line-height: 1.18;
       letter-spacing: -0.03em;
       color: var(--color-text-main);
-      margin-bottom: 20px;
+      margin-bottom: 1rem;
     }
 
-    .article-subtitle {
+    p.article-subtitle {
       font-family: var(--font-serif);
-      font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+      font-size: clamp(1.15rem, 2vw, 1.35rem);
+      font-style: italic;
       color: var(--color-text-muted);
       line-height: 1.5;
-      font-weight: 400;
-      margin-bottom: 32px;
+      margin-bottom: 1.5rem;
     }
 
-    .meta-bar {
+    .meta-byline {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 16px;
-      padding: 16px 20px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
       font-size: 0.875rem;
-      color: var(--color-text-muted);
-      box-shadow: var(--shadow-sm);
+      color: var(--color-text-faint);
     }
 
-    .meta-author {
-      font-weight: 700;
+    .author-name {
+      font-weight: 600;
       color: var(--color-text-main);
     }
 
     h2.section-heading {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: var(--color-text-main);
+      font-size: 1.6rem;
+      font-weight: 700;
       letter-spacing: -0.02em;
-      margin-top: 56px;
-      margin-bottom: 20px;
+      margin-top: 2.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--color-text-main);
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    h2.section-heading::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 24px;
-      background: linear-gradient(180deg, #059669, #2563eb);
-      border-radius: 2px;
+      gap: 8px;
     }
 
     h3.subsection-heading {
-      font-size: 1.28rem;
+      font-size: 1.25rem;
       font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-top: 1.75rem;
+      margin-bottom: 0.5rem;
       color: var(--color-text-main);
-      letter-spacing: -0.015em;
-      margin-top: 36px;
-      margin-bottom: 14px;
     }
 
     p {
-      margin-bottom: 22px;
+      margin-bottom: 1.25rem;
+      color: var(--color-text-muted);
+    }
+
+    p strong {
       color: var(--color-text-main);
-      font-size: 1.0625rem;
-    }
-
-    ul, ol {
-      margin-bottom: 28px;
-      padding-left: 28px;
-    }
-
-    li {
-      margin-bottom: 10px;
-      color: var(--color-text-main);
-    }
-
-    strong {
-      color: var(--color-text-main);
-      font-weight: 700;
-    }
-
-    a {
-      color: var(--color-primary);
-      text-decoration: underline;
-      text-decoration-thickness: 1.5px;
-      text-underline-offset: 3px;
-      transition: color 0.15s ease;
-    }
-
-    a:hover {
-      color: var(--color-primary-hover);
     }
 
     blockquote {
-      background: var(--color-surface-sunken);
-      border-left: 4px solid var(--color-primary);
-      padding: 16px 22px;
-      margin: 28px 0;
+      border-left: 3px solid var(--color-primary);
+      padding: 1rem 1.25rem;
+      background-color: var(--color-primary-soft);
       border-radius: 0 8px 8px 0;
-      font-size: 1.125rem;
-      font-family: var(--font-serif);
-      font-style: italic;
+      margin: 1.5rem 0;
       color: var(--color-text-main);
+      font-size: 1.05rem;
+      line-height: 1.65;
     }
 
-    .callout-box {
-      border-radius: 12px;
-      padding: 22px 26px;
-      margin: 32px 0;
-      border: 1px solid var(--color-border);
-      box-shadow: var(--shadow-sm);
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text-muted);
     }
 
-    .callout-box.info {
-      background: var(--color-primary-soft);
-      border-left: 6px solid #2563eb;
+    li {
+      margin-bottom: 0.5rem;
     }
 
-    .callout-box.india {
-      background: var(--color-amber-soft);
-      border-left: 6px solid #d97706;
-    }
-
-    .callout-box.verified {
-      background: var(--color-emerald-soft);
-      border-left: 6px solid #059669;
-    }
-
-    .callout-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 0.95rem;
-      margin-bottom: 10px;
-    }
-
-    .callout-box.info .callout-header { color: #1e40af; }
-    .callout-box.india .callout-header { color: #92400e; }
-    .callout-box.verified .callout-header { color: #065f46; }
-
-    .callout-box p:last-child {
-      margin-bottom: 0;
+    li strong {
+      color: var(--color-text-main);
     }
 
     code {
       font-family: var(--font-mono);
       font-size: 0.88em;
-      background: var(--color-surface-sunken);
-      color: var(--color-text-main);
-      padding: 2px 7px;
-      border-radius: 6px;
+      background-color: var(--color-surface-sunken);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
       border: 1px solid var(--color-border);
+      color: #be123c;
     }
 
-    /* Diagram Card */
-    .diagram-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 16px;
-      margin: 40px 0;
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-    }
-
-    .diagram-header-bar {
-      padding: 14px 20px;
-      background: var(--color-surface-sunken);
-      border-bottom: 1px solid var(--color-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .diagram-pill {
-      background: var(--color-emerald-soft);
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-
-    .diagram-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--color-text-main);
-    }
-
-    .diagram-svg-container {
-      padding: 28px 24px;
-      overflow-x: auto;
-      display: flex;
-      justify-content: center;
-      background: var(--color-surface);
-    }
-
-    .diagram-svg-container svg {
-      width: 100%;
-      height: auto;
-      max-width: 1000px;
-      display: block;
-    }
-
-    .diagram-caption {
-      padding: 12px 20px;
-      background: var(--color-surface-sunken);
-      border-top: 1px solid var(--color-border);
-      font-size: 0.8125rem;
-      color: var(--color-text-muted);
-      text-align: center;
-    }
-
-    /* Full-Width Table */
-    .table-container {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 14px;
-      margin: 36px 0;
-      overflow-x: auto;
-      box-shadow: var(--shadow-sm);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.92rem;
-    }
-
-    thead {
-      background: var(--color-surface-sunken);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    th {
-      padding: 14px 18px;
-      font-weight: 700;
-      color: var(--color-text-main);
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    td {
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--color-border-subtle);
-      color: var(--color-text-main);
-      vertical-align: middle;
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Terminal UI & Code Snippets */
+    /* Terminal & Code Blocks */
     .terminal-card {
-      background: #0d1117;
-      border: 1px solid #30363d;
+      background-color: #0f172a;
       border-radius: 12px;
-      margin: 36px 0;
       overflow: hidden;
       box-shadow: var(--shadow-lg);
+      margin: 2rem 0;
+      border: 1px solid #1e293b;
     }
 
     .terminal-bar {
-      background: #161b22;
-      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #30363d;
+      padding: 10px 16px;
+      background-color: #1e293b;
+      border-bottom: 1px solid #334155;
     }
 
     .terminal-dots {
       display: flex;
-      align-items: center;
       gap: 6px;
     }
 
@@ -483,74 +324,205 @@
       border-radius: 50%;
     }
 
-    .dot-red { background: #ff5f56; }
-    .dot-yellow { background: #ffbd2e; }
-    .dot-green { background: #27c93f; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
 
     .terminal-label {
       font-family: var(--font-mono);
-      font-size: 0.78rem;
-      color: #8b949e;
-      font-weight: 500;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .copy-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #c9d1d9;
-      font-size: 0.75rem;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 6px;
+      background: transparent;
+      border: 1px solid #475569;
+      color: #94a3b8;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      border-radius: 4px;
       cursor: pointer;
+      font-family: var(--font-mono);
       transition: all 0.15s ease;
     }
 
     .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.18);
+      background: #334155;
       color: #ffffff;
     }
 
     .terminal-body {
-      padding: 20px 24px;
+      padding: 16px 20px;
       overflow-x: auto;
     }
 
     .terminal-body pre {
       font-family: var(--font-mono);
-      font-size: 0.9rem;
-      line-height: 1.65;
-      color: #e6edf3;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: #e2e8f0;
       margin: 0;
     }
 
-    /* Math formula display */
     .formula-box {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin: 20px 0;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #2563eb;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 1.25rem 0;
       font-family: var(--font-mono);
-      font-size: 0.92rem;
-      color: #1e293b;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #0f172a;
       overflow-x: auto;
     }
 
-    footer.post-footer {
-      grid-column: breakout;
-      border-top: 1px solid var(--color-border);
-      padding-top: 20px;
-      padding-bottom: 16px;
-      margin-top: 28px;
+    /* Architecture Diagram Card */
+    .diagram-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      margin: 2.5rem 0;
+    }
+
+    .diagram-header-bar {
+      padding: 12px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--color-border);
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .diagram-pill {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .diagram-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--color-text-main);
+      margin-left: 8px;
+    }
+
+    .diagram-svg-container {
+      padding: 24px 20px;
+      display: flex;
+      justify-content: center;
+      background: #ffffff;
+      overflow-x: auto;
+    }
+
+    .diagram-svg-container svg {
+      width: 100%;
+      height: auto;
+      max-width: 1040px;
+      display: block;
+    }
+
+    .diagram-caption {
+      padding: 12px 20px;
+      background: #fafbfc;
+      border-top: 1px solid var(--color-border-subtle);
+      font-size: 0.825rem;
+      color: var(--color-text-faint);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      overflow-x: auto;
+      margin: 2rem 0;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      background: var(--color-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      padding: 12px 18px;
+      font-weight: 700;
+      color: var(--color-text-main);
+      border-bottom: 2px solid var(--color-border);
+      letter-spacing: -0.01em;
+    }
+
+    td {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--color-border-subtle);
+      color: var(--color-text-muted);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background-color: #fafbfc;
+    }
+
+    .callout-box {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 1.75rem 0;
+      border-left: 4px solid;
+    }
+
+    .callout-box.india {
+      background-color: #f0fdf4;
+      border-color: #059669;
+    }
+
+    .callout-box.india .callout-header {
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .post-footer {
+      grid-column: 2;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.875rem;
+      color: var(--color-text-faint);
+      display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 16px;
-      font-size: 0.88rem;
-      color: var(--color-text-faint);
+    }
+
+    @media (max-width: 768px) {
+      .post-grid {
+        padding: 24px 16px 60px;
+      }
+      .diagram-svg-container {
+        padding: 12px 8px;
+      }
     }
   </style>
 </head>
@@ -561,17 +533,10 @@
   <nav class="site-nav">
     <div class="nav-inner">
       <a href="/" class="brand-group">
-        <svg class="brand-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Harsh Thumar logo">
-          <rect width="32" height="32" rx="8" fill="url(#brand-grad)"/>
-          <defs>
-            <linearGradient id="brand-grad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#2563eb"/>
-              <stop offset="1" stop-color="#4f46e5"/>
-            </linearGradient>
-          </defs>
-          <path d="M16 6.5L8.5 9.8V15.5C8.5 20.8 11.7 25.2 16 26.5C20.3 25.2 23.5 20.8 23.5 15.5V9.8L16 6.5Z" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="16" cy="13.2" r="2.2" fill="#ffffff"/>
-          <path d="M14.6 16.2H17.4L18 20.8H14L14.6 16.2Z" fill="#ffffff"/>
+        <svg class="brand-logo" viewBox="0 0 32 32" fill="none">
+          <rect width="32" height="32" rx="8" fill="#2563eb"/>
+          <path d="M16 6L7 10V16C7 21.5 10.8 26.6 16 28C21.2 26.6 25 21.5 25 16V10L16 6Z" fill="#1d4ed8" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 13V21M20 13V21M12 17H20" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
         </svg>
         <span class="brand-title">Harsh Thumar</span>
       </a>
@@ -586,51 +551,81 @@
   <main class="post-grid">
 
     <header class="article-header">
-      <span class="tag-pill">Cryptographic Architecture Whitepaper &middot; India</span>
+      <div class="status-badge">
+        <span>Formal Verification in Tamarin · NPCI UPI Circle Research</span>
+      </div>
       <h1 class="article-title">Agent Authorization for Indian Payments, Formally</h1>
-      <p class="article-subtitle">What a UPI-Style Mandate Must Cryptographically Bind When an AI Agent Pays, and Which Defensive Checks Protect What.</p>
+      <p class="article-subtitle">What a UPI-Style Mandate Must Cryptographically Bind When an AI Agent Pays, and Which Defensive Checks Protect What</p>
       
-      <div class="meta-bar">
-        <span class="meta-author">Harsh Thumar</span>
-        <span>&middot;</span>
-        <span>Remote Participant, IETF 127</span>
-        <span>&middot;</span>
-        <span>Independent Researcher</span>
-        <span>&middot;</span>
+      <div class="meta-byline">
+        <span class="author-name">Harsh Thumar</span>
+        <span>&bull;</span>
+        <span>remote participant, IETF 127; independent researcher</span>
+        <span>&bull;</span>
         <time datetime="2026-11-15">15 November 2026</time>
       </div>
     </header>
 
-    <div class="callout-box info">
-      <div class="callout-header">Public Research Notice</div>
-      <p>Public draft for comment. Not legal advice, not a regulatory interpretation, and not endorsed by NPCI, RBI, CERT-In, or any standards body. All formal Tamarin models (Model 05), verification lemmas, and the complete 64-combination ablation lattice are open source under the MIT license in the <a href="https://github.com/HarshThumar/mcp-auth-tamarin" target="_blank" rel="noopener">mcp-auth-tamarin</a> repository.</p>
-    </div>
-
     <!-- Section 1 -->
     <section>
       <h2 class="section-heading">1. Executive Summary</h2>
-      <p>As artificial intelligence agents transition from informational assistants to transactional actors, they are increasingly tasked with executing financial operations on behalf of human principals. In India, the Unified Payments Interface (UPI) ecosystem has established a global benchmark for instant retail payments. Through NPCI's UPI Circle initiative (introduced in circular OC 201 and expanded to IoT devices and software entities in addendum OC 201-B), India already possesses a production framework for delegating payment authority from a primary account holder to a secondary user or automated software agent.</p>
-      
-      <p>The central engineering and cryptographic question is:</p>
-      <blockquote>When an autonomous software agent executes payments under a delegated mandate, what guarantees that every debit remains strictly within the bounds approved by the human principal?</blockquote>
+      <p>As artificial intelligence agents transition from informational chat assistants to autonomous transactional actors, they are increasingly tasked with executing financial disbursements on behalf of human principals. In India, the Unified Payments Interface (UPI) ecosystem represents the global benchmark for retail payments. Through NPCI's UPI Circle initiative (introduced in circular OC 201 and expanded to IoT devices and software entities in addendum OC 201-B), India already possesses a production architecture for delegating payment authority from a primary account holder to a secondary delegate or autonomous software entity.</p>
 
-      <p>To answer this question without relying on informal assertions, we developed a machine-checked formal protocol model in the Tamarin prover (<code>models/05_agent_payment_mandate.spthy</code>). The model formalizes the interaction between a human principal (payer), an authorization server (issuing PSP/bank), an autonomous software agent, a payment server (acquiring PSP/switch), and an active Dolev-Yao network attacker who can intercept, alter, and inject network traffic, while accounting for leaked payment logs (as posited in the FAPI 2.0 attacker model).</p>
+      <p>The core systems and cryptographic question is straightforward:</p>
 
-      <p>The model incorporates modern OAuth 2.1 building blocks:</p>
+      <blockquote>
+        When an autonomous software agent executes payments under a delegated mandate, what mathematical guarantees ensure that every debit remains strictly within the bounds approved by the human principal?
+      </blockquote>
+
+      <p>To evaluate this question without relying on informal assertions, we developed a machine-checked formal protocol model in the Tamarin prover (<code>models/05_agent_payment_mandate.spthy</code>). The model formalizes the interaction between a human principal (payer), an authorization server (issuing bank / PSP), an autonomous software agent, a payment switch (NPCI UPI Switch and MMS), and an active Dolev-Yao network attacker who can intercept, alter, and inject network packets, alongside leaked payment request logs (consistent with the FAPI 2.0 attacker model A5).</p>
+
+      <p>The architecture formalizes four complementary cryptographic controls:</p>
       <ul>
-        <li><strong>Rich Authorization Requests (RFC 9396):</strong> Expressing granular financial scopes, merchant identities, and amount caps.</li>
-        <li><strong>Resource Indicators (RFC 8707):</strong> Binding mandates to explicit payment server audiences.</li>
-        <li><strong>Demonstrating Proof-of-Possession (RFC 9449 DPoP):</strong> Cryptographically binding mandates to agent-held asymmetric keypairs.</li>
-        <li><strong>Online Token Revocation (RFC 7009):</strong> Real-time lookup of mandate validity at execution time.</li>
+        <li><strong>Rich Authorization Requests (RFC 9396):</strong> Structuring explicit financial bounds, merchant identities, and amount caps inside mandate tokens.</li>
+        <li><strong>Resource Indicators (RFC 8707):</strong> Restricting mandates to single, designated payment server audiences to prevent multi-gateway redirection attacks.</li>
+        <li><strong>Demonstrating Proof-of-Possession (RFC 9449 DPoP):</strong> Binding mandates cryptographically to agent-held asymmetric keypairs (<code>cnf</code> claim) and requiring fresh digital signatures on outbound payment requests.</li>
+        <li><strong>Synchronous Online Revocation (RFC 7009):</strong> Requiring payment switches to query the central Mandate Management System (MMS) in real-time before executing debits.</li>
       </ul>
 
-      <p>When all defensive checks are active, Tamarin mathematically verifies three core security lemmas across every possible execution trace:</p>
+      <p>When all defensive controls are active, the Tamarin prover mathematically verifies three core security lemmas across every possible trace:</p>
       <ul>
-        <li><strong>Lemma P10 (Debit Within Intent):</strong> A debit occurs if and only if it targets the approved payee, at the designated payment server, within the authorized amount cap.</li>
-        <li><strong>Lemma P11 (Immediate Revocation Enforcement):</strong> No payment succeeds after the human principal delinks or revokes the mandate.</li>
-        <li><strong>Lemma P12 (Authentic Agent Requests):</strong> An honest agent's payment request cannot be forged, replayed, or manipulated by an attacker who observes previous network traffic or payment logs.</li>
+        <li><strong>Lemma P10 (Debit Within Intent):</strong> Every debit for an honest principal moves funds only to an intended payee, at the designated payment server, within the authorized amount cap.</li>
+        <li><strong>Lemma P11 (Immediate Revocation Enforcement):</strong> No debit succeeds after the human principal delinks or revokes the mandate in their banking application.</li>
+        <li><strong>Lemma P12 (Authentic Agent Requests):</strong> An honest agent's payment request cannot be forged, replayed, or manipulated by an attacker who observes network transit or leaked server logs.</li>
       </ul>
+
+      <p>By systematically evaluating the complete 6-card ablation lattice across these checks, we demonstrate that these defensive mechanisms are orthogonal and non-redundant:</p>
     </section>
+
+    <!-- Breakout Table: Minimal Check Sets -->
+    <div class="breakout table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Security Property</th>
+            <th>Required Cryptographic Controls</th>
+            <th>Prover Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>P10 (Debit within intent)</strong></td>
+            <td>Principal OOB consent + Payee exact match + Amount cap + Server audience check</td>
+            <td>Formally verified across all traces</td>
+          </tr>
+          <tr>
+            <td><strong>P11 (No debit after cancellation)</strong></td>
+            <td>Synchronous per-transaction MMS online revocation lookup</td>
+            <td>Formally verified; fails under static TTL caching</td>
+          </tr>
+          <tr>
+            <td><strong>P12 (Authentic agent requests)</strong></td>
+            <td>RFC 9449 DPoP asymmetric proof of possession</td>
+            <td>Formally verified; bearer tokens fail under log leakage</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Figure 1: Full System Topology Vector SVG Architecture Diagram -->
     <div class="breakout diagram-card">
@@ -642,127 +637,182 @@
       </div>
 
       <div class="diagram-svg-container">
-        <svg viewBox="0 0 1000 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Zone 1: Payer Trust Boundary -->
-          <rect x="20" y="20" width="270" height="460" rx="12" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5" stroke-dasharray="6 4"/>
-          <text x="35" y="45" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="800" fill="#6b21a8" letter-spacing="0.05em">ZONE 1: PAYER TRUST BOUNDARY</text>
+        <svg viewBox="0 0 1080 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="box-shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.06"/>
+            </filter>
+            
+            <marker id="arrow-indigo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#6366f1"/>
+            </marker>
+            <marker id="arrow-sky" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0284c7"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb"/>
+            </marker>
+            <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#d97706"/>
+            </marker>
+            <marker id="arrow-emerald" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#059669"/>
+            </marker>
+          </defs>
 
-          <!-- Component: Payer Device & CL -->
-          <rect x="35" y="65" width="240" height="110" rx="8" fill="#ffffff" stroke="#e9d5ff" stroke-width="1.5"/>
-          <rect x="45" y="75" width="60" height="20" rx="4" fill="#f3e8ff"/>
-          <text x="75" y="89" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#7e22ce" text-anchor="middle">PRIMARY UI</text>
-          <text x="45" y="112" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#1e1b4b">Primary Account Holder</text>
-          <text x="45" y="130" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#6b21a8">NPCI Common Library (CL)</text>
-          <text x="45" y="146" font-family="'JetBrains Mono', monospace" font-size="10" fill="#475569">MPIN / Biometric Auth Channel</text>
+          <!-- 1. Primary User / Payer Device -->
+          <g filter="url(#box-shadow)">
+            <rect x="40" y="40" width="280" height="205" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+            <path d="M 40 50 A 10 10 0 0 1 50 40 L 310 40 A 10 10 0 0 1 320 50 L 320 84 L 40 84 Z" fill="#f8fafc"/>
+            <line x1="40" y1="84" x2="320" y2="84" stroke="#e2e8f0" stroke-width="1"/>
+            
+            <rect x="52" y="52" width="76" height="20" rx="4" fill="#e0e7ff"/>
+            <text x="90" y="66" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#3730a3" text-anchor="middle">PRIMARY UI</text>
+            <text x="136" y="66" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#1e1b4b">Primary Account Holder</text>
 
-          <!-- Component: Agent Runtime Sandbox -->
-          <rect x="35" y="200" width="240" height="260" rx="8" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
-          <rect x="45" y="210" width="90" height="20" rx="4" fill="#ffedd5"/>
-          <text x="90" y="224" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#c2410c" text-anchor="middle">AGENT SANDBOX</text>
-          <text x="45" y="248" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#1e1b4b">Autonomous AI Agent</text>
-          <text x="45" y="266" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#7c2d12">Secondary Delegate (OC 201-B)</text>
-          
-          <rect x="45" y="285" width="220" height="75" rx="6" fill="#fff7ed" stroke="#ffedd5"/>
-          <text x="55" y="303" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#9a3412">Cryptographic KeyStore</text>
-          <text x="55" y="320" font-family="'JetBrains Mono', monospace" font-size="10" fill="#431407">Ephemeral EC Key (P-256)</text>
-          <text x="55" y="336" font-family="'JetBrains Mono', monospace" font-size="10" fill="#431407">Signs DPoP Proof Token</text>
-          
-          <text x="45" y="380" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#64748b">Untrusted Text Ingestion</text>
-          <text x="45" y="396" font-family="'JetBrains Mono', monospace" font-size="10" fill="#94a3b8">Scraped Invoices, Web Tools</text>
+            <text x="54" y="112" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#4338ca">NPCI Common Library (CL)</text>
+            <text x="54" y="128" font-family="'JetBrains Mono', monospace" font-size="10" fill="#475569">Hardware-isolated MPIN Entry</text>
+            
+            <rect x="54" y="142" width="252" height="88" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="64" y="160" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#334155">Out-of-band Consent Channel:</text>
+            <text x="64" y="177" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#475569">&bull; Sets single-tx cap: INR 5,000</text>
+            <text x="64" y="193" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#475569">&bull; Sets monthly cap: INR 15,000</text>
+            <text x="64" y="209" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#475569">&bull; Locks allowed payee whitelist</text>
+          </g>
 
-          <!-- Zone 2: Banking & Authorization Boundary -->
-          <rect x="330" y="20" width="310" height="460" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="6 4"/>
-          <text x="345" y="45" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="800" fill="#1e40af" letter-spacing="0.05em">ZONE 2: ISSUER BANKING PERIMETER</text>
+          <!-- 2. Autonomous AI Agent -->
+          <g filter="url(#box-shadow)">
+            <rect x="40" y="285" width="280" height="215" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+            <path d="M 40 295 A 10 10 0 0 1 50 285 L 310 285 A 10 10 0 0 1 320 295 L 320 329 L 40 329 Z" fill="#fff7ed"/>
+            <line x1="40" y1="329" x2="320" y2="329" stroke="#ffedd5" stroke-width="1"/>
+            
+            <rect x="52" y="297" width="90" height="20" rx="4" fill="#ffedd5"/>
+            <text x="97" y="311" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#9a3412" text-anchor="middle">AGENT SANDBOX</text>
+            <text x="150" y="311" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#7c2d12">Autonomous AI Agent</text>
 
-          <!-- Component: Authorization Server -->
-          <rect x="345" y="65" width="280" height="180" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
-          <rect x="355" y="75" width="70" height="20" rx="4" fill="#dbeafe"/>
-          <text x="390" y="89" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#1d4ed8" text-anchor="middle">ISSUER AS</text>
-          <text x="355" y="114" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#0f172a">Issuer Bank PSP / AS</text>
-          <text x="355" y="132" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#1e40af">Mandate Issuance &amp; Token Registry</text>
-          
-          <rect x="355" y="145" width="260" height="85" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
-          <text x="365" y="163" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#334155">Mandate Token Stamping:</text>
-          <text x="365" y="180" font-family="'JetBrains Mono', monospace" font-size="10" fill="#1e293b">&bull; aud: Payment Server Switch</text>
-          <text x="365" y="195" font-family="'JetBrains Mono', monospace" font-size="10" fill="#1e293b">&bull; RAR: Payee VPAs, INR Caps</text>
-          <text x="365" y="210" font-family="'JetBrains Mono', monospace" font-size="10" fill="#1e293b">&bull; cnf: Agent Public Key</text>
+            <text x="54" y="352" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#c2410c">Secondary Delegate (OC 201-B)</text>
+            <text x="54" y="368" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b">LLM Orchestrator &amp; Tool Ingestion</text>
 
-          <!-- Component: Core Banking System -->
-          <rect x="345" y="270" width="280" height="190" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
-          <rect x="355" y="280" width="60" height="20" rx="4" fill="#dbeafe"/>
-          <text x="385" y="294" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#1d4ed8" text-anchor="middle">CORE CBS</text>
-          <text x="355" y="320" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#0f172a">Payer Core Banking System</text>
-          <text x="355" y="338" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#475569">Account Balance &amp; Ledger Holds</text>
-          <text x="355" y="360" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b">Primary Account: 501004921***</text>
-          <text x="355" y="376" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b">Mandate Cap Hold: INR 15,000</text>
-          <text x="355" y="392" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b">Online Delink Hook (Revocation)</text>
+            <rect x="54" y="382" width="252" height="102" rx="6" fill="#fffbf5" stroke="#fed7aa"/>
+            <text x="64" y="400" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#9a3412">Cryptographic KeyStore:</text>
+            <text x="64" y="417" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#7c2d12">&bull; Ephemeral EC Keypair (P-256)</text>
+            <text x="64" y="433" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#7c2d12">&bull; Public key bound via cnf JWK</text>
+            <text x="64" y="449" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#7c2d12">&bull; Signs DPoP header per debit</text>
+            <text x="64" y="465" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#7c2d12">&bull; Binds: htm, htu, ath, jti</text>
+          </g>
 
-          <!-- Zone 3: Central Payment Rail & Acquiring -->
-          <rect x="680" y="20" width="300" height="460" rx="12" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5" stroke-dasharray="6 4"/>
-          <text x="695" y="45" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="800" fill="#065f46" letter-spacing="0.05em">ZONE 3: NPCI SWITCH &amp; ACQUIRER</text>
+          <!-- 3. Remitter Bank (Issuer Bank & AS) -->
+          <g filter="url(#box-shadow)">
+            <rect x="390" y="40" width="310" height="205" rx="10" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+            <path d="M 390 50 A 10 10 0 0 1 400 40 L 690 40 A 10 10 0 0 1 700 50 L 700 84 L 390 84 Z" fill="#eff6ff"/>
+            <line x1="390" y1="84" x2="700" y2="84" stroke="#dbeafe" stroke-width="1"/>
+            
+            <rect x="402" y="52" width="78" height="20" rx="4" fill="#dbeafe"/>
+            <text x="441" y="66" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#1e40af" text-anchor="middle">ISSUER BANK</text>
+            <text x="488" y="66" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#1e3a8a">Remitter Bank (AS + CBS)</text>
 
-          <!-- Component: NPCI Switch & MMS -->
-          <rect x="695" y="65" width="270" height="180" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
-          <rect x="705" y="75" width="80" height="20" rx="4" fill="#d1fae5"/>
-          <text x="745" y="89" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#047857" text-anchor="middle">NPCI SWITCH</text>
-          <text x="705" y="114" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#064e3b">UPI Engine &amp; MMS</text>
-          <text x="705" y="132" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#047857">Mandate Management System</text>
-          
-          <rect x="705" y="145" width="250" height="85" rx="6" fill="#f0fdf4" stroke="#dcfce7"/>
-          <text x="715" y="163" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#065f46">Synchronous Invariant Verification:</text>
-          <text x="715" y="180" font-family="'JetBrains Mono', monospace" font-size="10" fill="#14532d">&bull; Real-time Revocation Check</text>
-          <text x="715" y="195" font-family="'JetBrains Mono', monospace" font-size="10" fill="#14532d">&bull; DPoP htu/ath Signature Proof</text>
-          <text x="715" y="210" font-family="'JetBrains Mono', monospace" font-size="10" fill="#14532d">&bull; Payee VPA &amp; Transaction Cap</text>
+            <text x="404" y="112" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#1d4ed8">Authorization Server &amp; Core Banking</text>
+            <text x="404" y="128" font-family="'JetBrains Mono', monospace" font-size="10" fill="#475569">Mandate Stamping &amp; Ledger Holds</text>
 
-          <!-- Component: Acquiring PSP & Merchant -->
-          <rect x="695" y="270" width="270" height="190" rx="8" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
-          <rect x="705" y="280" width="80" height="20" rx="4" fill="#d1fae5"/>
-          <text x="745" y="294" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#047857" text-anchor="middle">MERCHANT</text>
-          <text x="705" y="320" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#064e3b">Acquiring PSP &amp; Payee</text>
-          <text x="705" y="338" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#047857">Merchant Settlement Node</text>
-          <text x="705" y="360" font-family="'JetBrains Mono', monospace" font-size="10" fill="#334155">Target: electricity-board@billdesk</text>
-          <text x="705" y="376" font-family="'JetBrains Mono', monospace" font-size="10" fill="#334155">Instant Credit via IMPS/UPI</text>
-          <text x="705" y="392" font-family="'JetBrains Mono', monospace" font-size="10" fill="#059669">&check; Immutable Ledger Receipt</text>
+            <rect x="404" y="142" width="282" height="88" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="414" y="160" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#334155">Mandate Token Minting:</text>
+            <text x="414" y="177" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#1e293b">&bull; aud: https://switch.npci.org.in</text>
+            <text x="414" y="193" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#1e293b">&bull; RAR: allowed_payees, caps</text>
+            <text x="414" y="209" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#1e293b">&bull; cnf: Agent EC Public Key</text>
+          </g>
 
-          <!-- Pipelines & Arrows across boundaries -->
-          <!-- Flow 1: Payer to AS -->
-          <path d="M 275 110 L 345 110" stroke="#7e22ce" stroke-width="2"/>
-          <polygon points="340,106 348,110 340,114" fill="#7e22ce"/>
-          <text x="310" y="103" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#6b21a8" text-anchor="middle">1. MPIN</text>
+          <!-- 4. NPCI UPI Central Switch & MMS -->
+          <g filter="url(#box-shadow)">
+            <rect x="390" y="285" width="310" height="215" rx="10" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5"/>
+            <path d="M 390 295 A 10 10 0 0 1 400 285 L 690 285 A 10 10 0 0 1 700 295 L 700 329 L 390 329 Z" fill="#ecfdf5"/>
+            <line x1="390" y1="329" x2="700" y2="329" stroke="#d1fae5" stroke-width="1"/>
+            
+            <rect x="402" y="297" width="86" height="20" rx="4" fill="#d1fae5"/>
+            <text x="445" y="311" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#065f46" text-anchor="middle">NPCI SWITCH</text>
+            <text x="496" y="311" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#064e3b">UPI Engine &amp; Central MMS</text>
 
-          <!-- Flow 2: AS to Agent -->
-          <path d="M 400 245 L 400 260 L 275 260" stroke="#2563eb" stroke-width="2"/>
-          <polygon points="280,256 272,260 280,264" fill="#2563eb"/>
-          <text x="330" y="254" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="middle">2. Mandate JWT</text>
+            <text x="404" y="352" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#047857">Mandate Management System</text>
+            <text x="404" y="368" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b">Real-time Revocation &amp; Invariants</text>
 
-          <!-- Flow 3: Agent to Switch -->
-          <path d="M 275 420 L 700 420 L 700 245" stroke="#d97706" stroke-width="2"/>
-          <polygon points="696,250 700,242 704,250" fill="#d97706"/>
-          <text x="490" y="414" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#b45309" text-anchor="middle">3. POST /pay + DPoP Proof</text>
+            <rect x="404" y="382" width="282" height="102" rx="6" fill="#f0fdf4" stroke="#a7f3d0"/>
+            <text x="414" y="400" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#065f46">Synchronous Invariant Verification:</text>
+            <text x="414" y="417" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#14532d">&bull; Real-time MMS Revocation Check</text>
+            <text x="414" y="433" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#14532d">&bull; DPoP ath &amp; htu ES256 Signature</text>
+            <text x="414" y="449" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#14532d">&bull; Payee VPA Whitelist Strict Match</text>
+            <text x="414" y="465" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#14532d">&bull; Max-per-tx &amp; Monthly Limit Check</text>
+          </g>
 
-          <!-- Flow 4: Switch to MMS & CBS Status Inquiry -->
-          <path d="M 695 180 L 625 180" stroke="#e11d48" stroke-width="2" stroke-dasharray="4 3"/>
-          <polygon points="630,176 622,180 630,184" fill="#e11d48"/>
-          <text x="660" y="174" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#be123c" text-anchor="middle">4. Check</text>
+          <!-- 5. Beneficiary Bank & Merchant -->
+          <g filter="url(#box-shadow)">
+            <rect x="760" y="160" width="280" height="240" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+            <path d="M 760 170 A 10 10 0 0 1 770 160 L 1030 160 A 10 10 0 0 1 1040 170 L 1040 204 L 760 204 Z" fill="#f8fafc"/>
+            <line x1="760" y1="204" x2="1040" y2="204" stroke="#e2e8f0" stroke-width="1"/>
+            
+            <rect x="772" y="172" width="90" height="20" rx="4" fill="#e2e8f0"/>
+            <text x="817" y="186" font-family="'Plus Jakarta Sans', sans-serif" font-size="9" font-weight="700" fill="#334155" text-anchor="middle">MERCHANT</text>
+            <text x="870" y="186" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="700" fill="#0f172a">Acquiring Bank / Payee</text>
 
-          <!-- Flow 5: Switch to Merchant Settlement -->
-          <path d="M 830 245 L 830 270" stroke="#059669" stroke-width="2.5"/>
-          <polygon points="826,265 830,273 834,265" fill="#059669"/>
-          <text x="875" y="260" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#047857">5. Settlement</text>
+            <text x="774" y="228" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="700" fill="#334155">Merchant Settlement Node</text>
+            <text x="774" y="244" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b">Beneficiary CBS &amp; Terminal</text>
+
+            <rect x="774" y="258" width="252" height="126" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+            <text x="784" y="278" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#334155">Settlement Invariants:</text>
+            <text x="784" y="297" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#475569">Target VPA: electricity-board@billdesk</text>
+            <text x="784" y="315" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#475569">Instant Credit via UPI Rail</text>
+            <text x="784" y="333" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#059669">&check; Dual-Leg Settlement Done</text>
+            <text x="784" y="351" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#059669">&check; Non-Repudiable Receipt</text>
+          </g>
+
+          <!-- FLOW CONNECTORS -->
+
+          <!-- Flow 1: OOB MPIN Consent (Payer -> Remitter Bank) -->
+          <path d="M 320 120 L 382 120" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrow-indigo)"/>
+          <rect x="330" y="98" width="52" height="18" rx="4" fill="#e0e7ff"/>
+          <text x="356" y="111" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#3730a3" text-anchor="middle">1. MPIN</text>
+
+          <!-- Flow 2: MMS State Synchronization (Remitter Bank -> NPCI MMS) -->
+          <path d="M 500 245 L 500 277" stroke="#0284c7" stroke-width="2.5" marker-end="url(#arrow-sky)"/>
+          <rect x="466" y="254" width="68" height="18" rx="4" fill="#e0f2fe"/>
+          <text x="500" y="267" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#0369a1" text-anchor="middle">2. MMS Sync</text>
+
+          <!-- Flow 3: Mandate JWT Delivery (Remitter Bank -> Agent Sandbox) -->
+          <path d="M 430 245 L 430 265 L 350 265 L 350 350 L 328 350" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+          <rect x="360" y="278" width="62" height="18" rx="4" fill="#dbeafe"/>
+          <text x="391" y="291" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#1d4ed8" text-anchor="middle">3. JWT Token</text>
+
+          <!-- Flow 4: Payment Initiation with DPoP (Agent -> NPCI Switch) -->
+          <path d="M 320 440 L 382 440" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrow-amber)"/>
+          <rect x="328" y="418" width="56" height="18" rx="4" fill="#fef3c7"/>
+          <text x="356" y="431" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#b45309" text-anchor="middle">4. DPoP Pay</text>
+
+          <!-- Flow 5a: Synchronous CBS Debit Leg (NPCI Switch -> Remitter Bank) -->
+          <path d="M 600 285 L 600 253" stroke="#059669" stroke-width="2.5" marker-end="url(#arrow-emerald)"/>
+          <rect x="566" y="254" width="68" height="18" rx="4" fill="#d1fae5"/>
+          <text x="600" y="267" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#047857" text-anchor="middle">5a. CBS Debit</text>
+
+          <!-- Flow 5b: Dual-Leg CBS Credit Leg (NPCI Switch -> Beneficiary Bank) -->
+          <path d="M 700 370 L 752 370" stroke="#059669" stroke-width="2.5" marker-end="url(#arrow-emerald)"/>
+          <rect x="702" y="348" width="52" height="18" rx="4" fill="#d1fae5"/>
+          <text x="728" y="361" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" fill="#047857" text-anchor="middle">5b. Credit</text>
+
+          <!-- Flow 6: Non-repudiable Receipt Confirmation -->
+          <path d="M 760 210 L 720 210 L 720 340 L 708 340" stroke="#64748b" stroke-width="1.8" stroke-dasharray="4 3" marker-end="url(#arrow-indigo)"/>
+          <rect x="710" y="198" width="46" height="16" rx="4" fill="#f1f5f9"/>
+          <text x="733" y="210" font-family="'Plus Jakarta Sans', sans-serif" font-size="8" font-weight="700" fill="#475569" text-anchor="middle">6. Ack</text>
         </svg>
       </div>
 
       <div class="diagram-caption">
-        Figure 1: Full system topology and boundary isolation of an autonomous agent payment under UPI Circle, including out-of-band Common Library MPIN consent, DPoP key binding, and synchronous MMS status inquiry.
+        Figure 1: Complete cryptographic systems topology of an autonomous agent payment under UPI Circle, showing out-of-band Common Library MPIN consent, central MMS state synchronization, DPoP key binding, and synchronous dual-leg clearing.
       </div>
     </div>
 
     <!-- Section 2 -->
     <section>
       <h2 class="section-heading">2. The Delegation Problem: Autonomous Software Agents Under UPI Circle</h2>
-      <p>In a standard human-to-merchant UPI payment, security is anchored in real-time, synchronous authentication: the account holder reviews the beneficiary name, Virtual Payment Address (VPA), and debit amount on a trusted smartphone screen, then inputs a 4- or 6-digit MPIN within an isolated common library. The transaction is approved immediately and settled atomically.</p>
+      <p>In standard human-to-merchant UPI transactions, security is anchored in real-time, synchronous authentication: the account holder inspects the merchant name, Virtual Payment Address (VPA), and transaction amount on a trusted smartphone screen, then inputs a 4- or 6-digit MPIN within an isolated common library. The authorization is contemporaneous with debit execution.</p>
 
-      <p>Delegated agent payments under UPI Circle decouple the moment of user approval from the moment of execution. Under NPCI Circular OC 201 (August 2024) and Addendum OC 201-B (October 2025), a primary account holder grants payment authority to a secondary user, IoT device, or automated software agent. Two distinct operational modes exist:</p>
+      <p>Delegated agent payments under UPI Circle decouple the moment of user authorization from the moment of execution. Under NPCI Circular OC 201 (August 2024) and Addendum OC 201-B (October 2025), a primary account holder grants payment authority to a secondary user, IoT device, or automated software agent. Two distinct operational modes exist:</p>
 
       <ol>
         <li><strong>Partial Delegation (Approve Each Payment):</strong> The secondary user or agent initiates the transaction, but the primary user must review and authenticate the debit with their MPIN on their primary device before funds move.</li>
@@ -866,7 +916,58 @@
       <h2 class="section-heading">4. Formal Tamarin Specification &amp; Proof Mechanics</h2>
       <p>We formalized this payment lifecycle in the Tamarin prover under the theory <code>Agent_Payment_Mandate</code>. The model specifies multi-set rewriting rules for setup, mandate issuance, agent execution, and payment server validation.</p>
 
-      <h3 class="subsection-heading">4.1 Formal Security Lemmas</h3>
+      <h3 class="subsection-heading">4.1 Multiset Rewriting Rules for Protocol Transitions</h3>
+      <p>The core execution transition rules demonstrate how cryptographic proof verification is modeled without bearer token assumptions:</p>
+    </section>
+
+    <div class="breakout terminal-card">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <span class="terminal-label">spthy: agent payment execution rule</span>
+      </div>
+      <div class="terminal-body">
+        <pre><code>// The honest agent pays its task's payee, within the cap, at the mandate's
+// payment server, with a proof of possession. Requests leak (FAPI 2.0 A5).
+rule Agent_Pay:
+    [ St_Agent(~rid, $A, $U, $P, cap, $PS)
+    , FromAS(~rid, &lt;&lt;'mandate', mid, $U, $A, $P, cap, $PS, pkA&gt;, sigM&gt;)
+    , !AgentKey($A, ~sk), Fr(~pid) ]
+  --[ AgentPays($A, mid, $P, $amt, $PS), CapIs(cap), AmountOk(cap, $amt) ]-&gt;
+    [ Out(&lt;'pay', &lt;&lt;'mandate', mid, $U, $A, $P, cap, $PS, pkA&gt;, sigM&gt;, $P, $amt, ~pid,
+           sign(&lt;'pop', ~pid, $PS, $P, $amt, h(sigM)&gt;, ~sk)&gt;) ]</code></pre>
+      </div>
+    </div>
+
+    <div class="breakout terminal-card">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <span class="terminal-label">spthy: payment server invariant verification rule</span>
+      </div>
+      <div class="terminal-body">
+        <pre><code>// Payment server verifies mandate signature, DPoP proof-of-possession,
+// audience, payee whitelist, amount cap, and real-time revocation status.
+rule PS_Execute:
+    [ In(&lt;'pay', &lt;&lt;'mandate', mid, u, a, p, cap, aud, cnf&gt;, sigM&gt;, payee, amt, pid, proof&gt;)
+    , !ASPk(pkAS), !PS($PS) ]
+  --[ Eq(verify(sigM, &lt;'mandate', mid, u, a, p, cap, aud, cnf&gt;, pkAS), true)
+    , Eq(verify(proof, &lt;'pop', pid, $PS, payee, amt, h(sigM)&gt;, cnf), true)
+    , AudCheck(aud, $PS), PayeeCheck(p, payee), AmountCheck(cap, amt)
+    , StatusCheck(mid), PaymentId(pid)
+    , Debit(u, a, mid, payee, amt, $PS) ]-&gt;
+    [ ]</code></pre>
+      </div>
+    </div>
+
+    <section>
+      <h3 class="subsection-heading">4.2 Formal Security Lemmas</h3>
       <p>The prover evaluates three core trace lemmas representing the required security guarantees:</p>
 
       <p><strong>Lemma P10 (debit_within_intent):</strong> Proves that every debit executed for an honest principal moves funds only to an intended payee, at the intended payment server, within the authorized amount cap:</p>
@@ -909,7 +1010,7 @@ lemma debit_requested_by_agent:<br>
       <div class="diagram-svg-container">
         <svg viewBox="0 0 940 280" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="250" y="16" width="440" height="48" rx="8" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
-          <text x="470" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#065f46" text-anchor="middle">Hardened Baseline: All 6 Checks Active</text>
+          <text x="470" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="700" fill="#064e3b" text-anchor="middle">Hardened Baseline: All 6 Checks Active</text>
           <text x="470" y="53" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#059669" text-anchor="middle">Lemmas P10, P11, P12 Machine-Checked &amp; Formally Proved</text>
 
           <line x1="470" y1="64" x2="470" y2="86" stroke="#94a3b8" stroke-width="1.5"/>
