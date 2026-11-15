@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agent Authorization for Indian Payments, Formally · Harsh Thumar</title>
   <meta name="description" content="A formal cryptographic analysis of autonomous AI agent payments under NPCI's UPI Circle, rich authorization requests (RFC 9396), DPoP sender constraints, and real-time online revocation.">
+  <meta name="author" content="Harsh Thumar, Prince Upadhyay">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,7 +156,7 @@
         min(var(--content-width), 100% - (var(--viewport-pad) * 2)) 
         1fr;
       row-gap: 1.75rem;
-      padding: 40px var(--viewport-pad) 100px;
+      padding: 40px var(--viewport-pad) 40px;
     }
 
     .post-grid > * {
@@ -284,7 +285,7 @@
       color: var(--color-text-main);
     }
 
-    code {
+    :not(pre) > code {
       font-family: var(--font-mono);
       font-size: 0.88em;
       background-color: var(--color-surface-sunken);
@@ -356,14 +357,29 @@
     .terminal-body {
       padding: 16px 20px;
       overflow-x: auto;
+      background-color: #0f172a;
     }
 
     .terminal-body pre {
       font-family: var(--font-mono);
       font-size: 0.875rem;
       line-height: 1.6;
-      color: #e2e8f0;
+      color: #e2e8f0 !important;
       margin: 0;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+    }
+
+    .terminal-body code {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      color: #e2e8f0 !important;
+      font-family: var(--font-mono) !important;
+      font-size: inherit !important;
+      box-shadow: none !important;
     }
 
     .formula-box {
@@ -502,18 +518,39 @@
       font-size: 0.95rem;
     }
 
-    .post-footer {
-      grid-column: 2;
-      margin-top: 4rem;
-      padding-top: 2rem;
+    .site-footer {
+      background-color: #f8fafc;
       border-top: 1px solid var(--color-border);
-      font-size: 0.875rem;
-      color: var(--color-text-faint);
+      padding: 36px var(--viewport-pad);
+      margin-top: 0;
+    }
+
+    .footer-inner {
+      max-width: var(--breakout-width);
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
+      font-size: 0.875rem;
+      color: var(--color-text-faint);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-primary);
     }
 
     @media (max-width: 768px) {
@@ -558,9 +595,9 @@
       <p class="article-subtitle">What a UPI-Style Mandate Must Cryptographically Bind When an AI Agent Pays, and Which Defensive Checks Protect What</p>
       
       <div class="meta-byline">
-        <span class="author-name">Harsh Thumar</span>
+        <span class="author-name">Harsh Thumar &amp; Prince Upadhyay</span>
         <span>&bull;</span>
-        <span>remote participant, IETF 127; independent researcher</span>
+        <span>remote participants, IETF 127; independent researchers</span>
         <span>&bull;</span>
         <time datetime="2026-11-15">15 November 2026</time>
       </div>
@@ -1216,13 +1253,18 @@ docker run --rm mcp-auth-tamarin ./scripts/reproduce.sh</code></pre>
         <li>IETF Standards &amp; Drafts: RFC 9396 (Rich Authorization Requests); RFC 8707 (Resource Indicators); RFC 9449 (DPoP); RFC 7009 (Token Revocation); draft-mishra-oauth-agent-grants-02 (OAuth Profile for Delegated AI Agent Authorization).</li>
       </ul>
     </section>
-
-    <footer class="post-footer">
-      <div>&copy; 2026 Harsh Thumar &middot; Published under MIT License</div>
-      <div>Formal Verification of Model Context Protocol &amp; Delegated Payment Mandates</div>
-    </footer>
-
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>&copy; 2026 Harsh Thumar &amp; Prince Upadhyay &middot; Published under MIT License</div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/blog/2026-11-ietf127-mcp-authorization/">MCP Blog</a>
+        <a href="https://github.com/HarshThumar/mcp-auth-tamarin" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     window.addEventListener('scroll', () => {

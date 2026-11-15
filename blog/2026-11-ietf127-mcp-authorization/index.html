@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Proving MCP Authorization: What We Modeled, What We Rediscovered, and Why Every Check Matters</title>
   <meta name="description" content="A machine-checked formal analysis of Model Context Protocol authorization in Tamarin, an ablation lattice of security checks, and a case study on UPI-style agent payments.">
+  <meta name="author" content="Harsh Thumar, Prince Upadhyay">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -753,20 +755,40 @@
       margin: 0 auto;
     }
 
-    /* Footer */
-    footer.post-footer {
-      grid-column: breakout;
+    /* Site Footer */
+    .site-footer {
+      background-color: #f8fafc;
       border-top: 1px solid var(--color-border);
-      padding-top: 20px;
-      padding-bottom: 16px;
-      margin-top: 28px;
+      padding: 36px var(--viewport-pad);
+      margin-top: 0;
+    }
+
+    .footer-inner {
+      max-width: var(--breakout-width);
+      margin: 0 auto;
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 16px;
-      font-size: 0.88rem;
+      font-size: 0.875rem;
       color: var(--color-text-faint);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      color: var(--color-text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--color-primary);
     }
   </style>
 </head>
@@ -816,15 +838,15 @@
       
       <div class="meta-bar">
         <div class="meta-item">
-          <span class="meta-author">Harsh Thumar</span>
+          <span class="meta-author">Harsh Thumar &amp; Prince Upadhyay</span>
         </div>
         <span class="meta-dot">&middot;</span>
         <div class="meta-item">
-          <span>Remote Participant, IETF 127</span>
+          <span>Remote Participants, IETF 127</span>
         </div>
         <span class="meta-dot">&middot;</span>
         <div class="meta-item">
-          <span>Independent Researcher</span>
+          <span>Independent Researchers</span>
         </div>
         <span class="meta-dot">&middot;</span>
         <div class="meta-item">
@@ -1293,12 +1315,18 @@ docker run --rm mcp-auth-tamarin ./scripts/reproduce.sh</code></pre>
       </ul>
     </section>
 
-    <footer class="post-footer">
-      <div>Published under MIT License &middot; IETF 127 Hackathon Project</div>
-      <div>Formal Verification of Model Context Protocol Authorization</div>
-    </footer>
-
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>&copy; 2026 Harsh Thumar &amp; Prince Upadhyay &middot; Published under MIT License</div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/whitepaper/agent-payments-india/">India Whitepaper</a>
+        <a href="https://github.com/HarshThumar/mcp-auth-tamarin" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     // Reading Progress Indicator
